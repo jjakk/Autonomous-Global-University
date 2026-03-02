@@ -28,9 +28,14 @@ function AppHeader() {
 
     return (
         <header className="nav-header">
+            <head>
+                <link rel="icon" type="image/svg+xml" href="/logo.png" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>AGU</title>
+            </head>
             <div className="nav-header-left">
                 <NavLink to="/">
-                    <img src="./logo.png" alt="logo" className="nav-header-logo" />
+                    <img src="/logo.png" alt="logo" className="nav-header-logo" />
                 </NavLink>
                 <div className="nav-header-text">
                     <h1>Autonomous Global</h1>
