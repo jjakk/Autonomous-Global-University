@@ -15,7 +15,7 @@ export const readingSchema_JSON = {
     properties: {
         title: { type: "string" },
         description: { type: "string" },
-        content: { type: "array", items: { type: "string" } }
+        content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
     },
     required: ["title", "description"]
 };

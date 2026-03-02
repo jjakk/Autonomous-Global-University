@@ -58,18 +58,11 @@ function PlanOfStudyPage() {
             ></ProgressBar> */}
             <h2>Your Plan of Study:</h2>
             <Accordion>
-                <AccordionTab header="Freshman Year">
-                    <CoursesRender courses={courses} startIndex={0} endIndex={courses.length / 4} />
-                </AccordionTab>
-                <AccordionTab header="Sophomore Year">
-                    <CoursesRender courses={courses} startIndex={courses.length / 4} endIndex={courses.length / 2} />
-                </AccordionTab>
-                <AccordionTab header="Junior Year">
-                    <CoursesRender courses={courses} startIndex={courses.length / 2} endIndex={(3 * courses.length) / 4} />
-                </AccordionTab>
-                <AccordionTab header="Senior Year">
-                    <CoursesRender courses={courses} startIndex={(3 * courses.length) / 4} endIndex={courses.length} />
-                </AccordionTab>
+                {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
+                    <AccordionTab header={year + " Year"}>
+                        <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
+                    </AccordionTab>
+                ))}
             </Accordion>
         </div>
     );

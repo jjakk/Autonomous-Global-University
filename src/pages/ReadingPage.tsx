@@ -8,6 +8,10 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
 import { getCourseLabel } from "../utils";
+import { Card } from "primereact/card";
+import { Splitter, SplitterPanel } from "primereact/splitter";
+import { RadioButton } from "primereact/radiobutton";
+import ReactMarkdown from "react-markdown";
 
 
 function ReadingPage() {
@@ -82,18 +86,43 @@ function ReadingPage() {
                 icon="pi pi-chevron-left"
             />
             <h1>{reading?.title}</h1>
-            <h2>{reading?.description}</h2>
             {loadingContent ? (
                 <div className="loading-content">
                     <ProgressSpinner />
                 </div>
             ) : (
                 <>
-                    <div className="reading-content">
-                        {reading?.content?.map((paragraph, index) => (
-                            <p key={index}>&emsp;{paragraph}</p>
-                        ))}
-                    </div>
+                    <Splitter className="reading-content">
+                        <SplitterPanel className="reading-content-text" minSize={25}>
+                            <h1>Reading</h1>
+                            {reading?.content?.map((paragraph, index) => (
+                                <div key={index}>
+                                    <ReactMarkdown>{paragraph}</ReactMarkdown>
+                                </div>
+                            ))}
+                        </SplitterPanel>
+                        <SplitterPanel minSize={25}>
+                            <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
+                                <h1>Quiz</h1>
+                                {/* {[
+                                    { question: "What is the main topic of the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                                    { question: "Which of the following is a key takeaway from the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                                    { question: "How does the reading relate to the overall course material?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                                ].map((q, index) => (
+                                    <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem", justifyContent: "space-between" }} key={index}>
+                                        <h3 key={index}>{q.question}</h3>
+                                        {q.options.map((option, i) => (
+                                            <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                                <RadioButton inputId={`option${i}`} name={`question${index}`} value={option} onChange={(e) => {}} checked={false} />
+                                                <label htmlFor={`option${i}`} className="ml-2">{option}</label>
+                                            </div>
+                                        ))}
+                                        <Button label="Check" onClick={() => {}} style={{ alignSelf: "center" }} />
+                                    </div>
+                                ))} */}
+                            </div>
+                        </SplitterPanel>
+                    </Splitter>
                     <div className="end-of-reading-actions">
                         <Button
                             label="Mark as Read"

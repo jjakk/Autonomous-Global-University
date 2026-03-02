@@ -39,7 +39,7 @@ export default class ChatAgent {
     }
     async createCourses(major: string): Promise<Course[]> {
         try {
-            const prompt = `Create a 4 year curriculum for a university student majoring in ${major}. Include core courses, electives, and a brief description of each course.`;
+            const prompt = `Create a 4 year curriculum for a university student majoring in ${major}. Include core courses, electives, and a brief description of each course. Order the courses starting with the easiest first, and the more rigorous courses later.`;
             const response = await this.ai.models.generateContent({
                 model: ChatAgent.model,
                 contents: prompt,
