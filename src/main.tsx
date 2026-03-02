@@ -73,7 +73,7 @@ let router = createBrowserRouter([
       }
     ],
   },
-], { basename: '/World-Autonomous-Global-University/' });
+]);
 
 
 
