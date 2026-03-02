@@ -52,7 +52,7 @@ function PlanOfStudyPage() {
 
     return (
         <div className="home-page">
-            <h1>Welcome to World Autonomous Global University!</h1>
+            <h1>Welcome to Autonomous Global University!</h1>
             {/* <ProgressBar
                 value={evalPlanOfStudyProgress(courses)}
             ></ProgressBar> */}

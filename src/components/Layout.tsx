@@ -32,8 +32,8 @@ function AppHeader() {
                     <img src="./logo.png" alt="logo" className="nav-header-logo" />
                 </NavLink>
                 <div className="nav-header-text">
-                    <h1>World Autonomous</h1>
-                    <h1>Global University</h1>
+                    <h1>Autonomous Global</h1>
+                    <h1>University</h1>
                     <h3>Education for All</h3>
                 </div>
             </div>
@@ -67,7 +67,7 @@ function AppHeader() {
 function AppFooter() {
     return (
         <footer className="app-footer">
-            <p>&copy; 2025 World Autonomous Global University. All rights reserved.</p>
+            <p>&copy; 2026 Autonomous Global University. All rights reserved.</p>
         </footer>
     );
 }

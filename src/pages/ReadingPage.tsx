@@ -8,9 +8,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
 import { getCourseLabel } from "../utils";
-import { Card } from "primereact/card";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { RadioButton } from "primereact/radiobutton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 

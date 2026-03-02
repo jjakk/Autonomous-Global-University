@@ -98,7 +98,7 @@ function GetStartedPage() {
   
   return (
     <div>
-      <h1>Welcome to WAGU!</h1>
+      <h1>Welcome to AGU!</h1>
       <Accordion activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index as any)} >
         <AccordionTab header="Model Selection & API Key" disabled={+activeIndex > 0}>
           <h2>Before getting started, please provide your preferable Model as well as an API key to power the application</h2>
@@ -164,7 +164,7 @@ function GetStartedPage() {
           </form>
         </AccordionTab>
         <AccordionTab header="Get started" disabled={activeIndex !== 2}>
-          <h2>You're all set! Click the button below to start your WAGU journey.</h2>
+          <h2>You're all set! Click the button below to start your AGU journey.</h2>
           <Button
             label="Get Started"
             loading={checkList.major.loading}
