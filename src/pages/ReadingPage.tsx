@@ -102,10 +102,10 @@ function ReadingPage() {
                                 </div>
                             ))}
                         </SplitterPanel>
-                        <SplitterPanel minSize={25}>
+                        {/* <SplitterPanel minSize={25}>
                             <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
                                 <h1>Quiz</h1>
-                                {/* {[
+                                {[
                                     { question: "What is the main topic of the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
                                     { question: "Which of the following is a key takeaway from the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
                                     { question: "How does the reading relate to the overall course material?", options: ["Option A", "Option B", "Option C", "Option D"] },
@@ -120,9 +120,9 @@ function ReadingPage() {
                                         ))}
                                         <Button label="Check" onClick={() => {}} style={{ alignSelf: "center" }} />
                                     </div>
-                                ))} */}
+                                ))}
                             </div>
-                        </SplitterPanel>
+                        </SplitterPanel> */}
                     </Splitter>
                     <div className="end-of-reading-actions">
                         <Button
