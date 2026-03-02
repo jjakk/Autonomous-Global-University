@@ -12,6 +12,7 @@ import { Card } from "primereact/card";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { RadioButton } from "primereact/radiobutton";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 
 function ReadingPage() {
@@ -97,7 +98,7 @@ function ReadingPage() {
                             <h1>Reading</h1>
                             {reading?.content?.map((paragraph, index) => (
                                 <div key={index}>
-                                    <ReactMarkdown>{paragraph}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{paragraph}</ReactMarkdown>
                                 </div>
                             ))}
                         </SplitterPanel>
