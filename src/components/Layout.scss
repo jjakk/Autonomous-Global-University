@@ -1,3 +1,8 @@
+.nav-header,
+.app-footer {
+    background-color: var(--primary-800);
+}
+
 .nav-header {
     display: flex;
     flex-direction: row;
@@ -7,7 +12,6 @@
     padding-right: 35px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: var(--primary-800);
     
     .nav-header-left {
         display: flex;
@@ -99,6 +103,5 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
-    background-color: var(--primary-700);
     color: white;
 }
