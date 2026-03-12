@@ -1,9 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import type { Reading } from "../classes/Course/Reading";
 import "./ReadingPage.scss";
 import { useEffect, useState } from "react";
 import AppStorage from "../classes/AppStorage";
-import type { Unit } from "../classes/Course/Unit";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
@@ -11,6 +9,7 @@ import { getCourseLabel } from "../utils";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { Reading, Unit } from "../classes/AguDatabase";
 
 
 function ReadingPage() {

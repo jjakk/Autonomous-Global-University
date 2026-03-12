@@ -1,15 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 import "./CoursePage.scss"
 import { useEffect, useState } from "react";
-import type Course from "../classes/Course/Course";
 import AppStorage from "../classes/AppStorage";
 import { evalCourseProgress, evalUnitProgress, getCourseLabel } from "../utils";
 import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
-import type { Unit } from "../classes/Course/Unit";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
+import type { Course, Unit } from "../classes/AguDatabase";
 
 function CoursePage() {
     let { courseIndex } = useParams();

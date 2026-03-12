@@ -1,11 +1,11 @@
 import "./PlanOfStudyPage.scss"
 import { useEffect, useState } from "react";
-import type Course from "../classes/Course/Course";
 import AppStorage from "../classes/AppStorage";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { ProgressBar } from "primereact/progressbar";
 import { evalCourseProgress, getCourseLabel } from "../utils";
 import { useNavigate } from "react-router-dom";
+import type { Course } from "../classes/AguDatabase";
 
 function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], startIndex: number, endIndex: number }) {
     const navigate = useNavigate();

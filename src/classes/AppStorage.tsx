@@ -1,8 +1,4 @@
-// This class handles the storage and retrieval of user preferences and settings for the AGU application. It uses the browser's localStorage API to persist data across sessions.
-
-import type Course from "./Course/Course";
-import type { Unit } from "./Course/Unit";
-import type { User } from "./User";
+import type { Course, Unit, User } from "./AguDatabase";
 
 export default class AppStorage {
     // USER
@@ -23,7 +19,6 @@ export default class AppStorage {
     static markRateLimitHit() {
         const user = this.getUser();
         if (user) {
-            user.hitRateLimit = true;
             this.saveUser(user);
         }
     }

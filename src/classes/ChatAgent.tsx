@@ -1,9 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import AppStorage from "./AppStorage";
 import { coursesSchema, coursesSchema_JSON, readingSchema, readingSchema_JSON, unitsSchema, unitsSchema_JSON } from "../zodTypes";
-import type Course from "./Course/Course";
-import type { Unit } from "./Course/Unit";
-import type { Reading } from "./Course/Reading";
+import type { Course, Reading, Unit } from "./AguDatabase";
 
 export default class ChatAgent {
     private static model = "gemini-2.5-flash";

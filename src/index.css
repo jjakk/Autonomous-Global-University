@@ -1,3 +1,23 @@
+@import 'tailwindcss';
+@layer tailwind-base, primereact, tailwind-utilities;
+
+/* VITE ONLY: In "styled" mode you must add the PrimeReact Theme here. Do NOT include in "unstyled" mode */
+@import 'primereact/resources/themes/lara-light-blue/theme.css';
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
+h1 { @apply text-4xl font-bold; }
+h2 { @apply text-3xl font-semibold; }
+h3 { @apply text-2xl font-medium; }
+p { @apply text-base; }
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

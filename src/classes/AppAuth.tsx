@@ -1,6 +1,5 @@
+import type { Course, User } from "./AguDatabase";
 import AppStorage from "./AppStorage";
-import type Course from "./Course/Course";
-import type { User } from "./User";
 
 export default class AppAuth {
     static isAuthenticated(): boolean {

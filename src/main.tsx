@@ -1,12 +1,11 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Layout from './components/Layout';
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom';
 import { PrimeReactProvider } from 'primereact/api';
 import 'primeicons/primeicons.css';
-import GetStartedPage from './pages/GetStartedPage.tsx';
+import GetStartedPage from './pages/GetStartedPage/GetStartedPage.tsx';
 import AppAuth from './classes/AppAuth.tsx';
 import PlanOfStudyPage from './pages/PlanOfStudyPage.tsx';
 import HitRateLimitPage from './pages/HitRateLimitPage.tsx';
