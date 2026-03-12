@@ -24,9 +24,8 @@ interface Step {
 function GetStartedPage() {
   const navigate = useNavigate();
 
-  const [activeIndex, setActiveIndex] = useState(2);
-  const [newUser, setNewUser] = useState<User>({
-    id: "",
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [newUser, setNewUser] = useState<Partial<User>>({
     apiKey: "",
     firstName: "",
     lastName: "",

@@ -8,8 +8,12 @@ export const ProfileSetup = (props: StepComponentProps) => {
     const [lastName, setLastName] = useState<string>(props.data.lastName || "");
 
     const onSubmit = () => {
+        if(!firstName.trim()) {
+            setFirstName("Guest");
+        }
+
         props.onComplete({
-            firstName,
+            firstName: firstName.trim() ? firstName : "Guest",
             lastName
         }); 
     };

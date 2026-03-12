@@ -1,5 +1,4 @@
 import { GoogleGenAI } from "@google/genai";
-import AppStorage from "./AppStorage";
 import { coursesSchema, coursesSchema_JSON, readingSchema, readingSchema_JSON, unitsSchema, unitsSchema_JSON } from "../zodTypes";
 import type { Course, Reading, Unit } from "./AguDatabase";
 
@@ -17,7 +16,7 @@ export default class ChatAgent {
     private static onFailedRequest(error: any) {
         if(error?.status === 429) {
             console.log("Rate limit hit. Marking in storage.");
-            AppStorage.markRateLimitHit();
+            // AppStorage.markRateLimitHit();
         }
     }
 
@@ -35,7 +34,7 @@ export default class ChatAgent {
             return false;
         }
     }
-    async createCourses(major: string): Promise<Course[]> {
+    async createPlanOfStudy(major: string): Promise<Course[]> {
         try {
             const prompt = `Create a 4 year curriculum for a university student majoring in ${major}. Include core courses, electives, and a brief description of each course. Order the courses starting with the easiest first, and the more rigorous courses later.`;
             const response = await this.ai.models.generateContent({
@@ -76,7 +75,7 @@ export default class ChatAgent {
             if(!response.text) {
                 throw new Error("No response from AI");
             }
-            const units: Unit[] = unitsSchema.parse(JSON.parse(response.text));
+            const units: Unit[] = unitsSchema.parse(JSON.parse(response.text)).map((u: Unit) => ({ ...u, courseId: course.id }));
             return units;
         }
         catch (error) {

@@ -4,18 +4,17 @@ import { NavLink, Outlet, useParams } from "react-router-dom";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
-import AppStorage from "../classes/AppStorage";
-import type Course from "../classes/Course/Course";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { InputTextarea } from "primereact/inputtextarea";
 import AppAuth from "../classes/AppAuth";
+import type { Course } from "../classes/AguDatabase";
 
 
 function AppHeader() {
     let { courseIndex } = useParams();
     const op = useRef<OverlayPanel>(null);
     const [taCourse, setTaCourse] = useState<Course | null>(null);
-    const courses = AppStorage.getCourses() || [];
+    const courses: Course[] = /*AppStorage.getCourses() ||*/ [];
 
     useEffect(() => {
         if(courseIndex && courses.length > 0) {

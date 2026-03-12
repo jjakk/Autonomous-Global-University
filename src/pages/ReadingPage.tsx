@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import "./ReadingPage.scss";
 import { useEffect, useState } from "react";
-import AppStorage from "../classes/AppStorage";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
@@ -14,13 +13,13 @@ import type { Reading, Unit } from "../classes/AguDatabase";
 
 function ReadingPage() {
     let { courseIndex, unitIndex, readingIndex } = useParams();
-    const course = AppStorage.getCourses()?.[parseInt(courseIndex || "-1")];
+    const course = null;//AppStorage.getCourses()?.[parseInt(courseIndex || "-1")];
     const navigate = useNavigate();
     const [reading, setReading] = useState<Reading | null>(null);
     const [loadingContent, setLoadingContent] = useState<boolean>(false);
 
     const retreiveReadingContent = async (reading: Reading): Promise<Reading> => {
-        const chatAgent = new ChatAgent(AppStorage.getUser()?.apiKey || "");
+        const chatAgent = new ChatAgent(/*AppStorage.getUser()?.apiKey || */"");
         const updatedReading = await chatAgent.createReadingContent(reading);
         return updatedReading;
     };
@@ -29,23 +28,23 @@ function ReadingPage() {
         if(reading) {
             const updatedReading = { ...reading, read: true };
             setReading(updatedReading);
-            AppStorage.markReadingAsRead(
-                parseInt(courseIndex || "-1"),
-                parseInt(unitIndex || "-1"),
-                parseInt(readingIndex || "-1")
-            );
+            // AppStorage.markReadingAsRead(
+            //     parseInt(courseIndex || "-1"),
+            //     parseInt(unitIndex || "-1"),
+            //     parseInt(readingIndex || "-1")
+            // );
         }
     };
 
     useEffect(() => {
-        const units: Unit[] | null = AppStorage.getCourseUnits(parseInt(courseIndex || "-1"));
-        if(units) {
+        const units: Unit[] = [];//AppStorage.getCourseUnits(parseInt(courseIndex || "-1"));
+        if(units.length > 0) {
             const foundUnit = units[parseInt(unitIndex || "-1")];
             if(foundUnit) {
-                const foundReading = foundUnit.readings[parseInt(readingIndex || "-1")];
-                if(foundReading) {
-                    setReading(foundReading);
-                }
+                // const foundReading = foundUnit.readings[parseInt(readingIndex || "-1")];
+                // if(foundReading) {
+                //     setReading(foundReading);
+                // }
             }
         }
     }, [courseIndex, unitIndex, readingIndex]);
@@ -58,12 +57,12 @@ function ReadingPage() {
                     const newReading: Reading = await retreiveReadingContent(reading);
                     setReading(newReading);
                     // Update the reading content in storage
-                    AppStorage.addReadingContent(
-                        parseInt(courseIndex || "-1"),
-                        parseInt(unitIndex || "-1"),
-                        parseInt(readingIndex || "-1"),
-                        newReading.content || []
-                    );
+                    // AppStorage.addReadingContent(
+                    //     parseInt(courseIndex || "-1"),
+                    //     parseInt(unitIndex || "-1"),
+                    //     parseInt(readingIndex || "-1"),
+                    //     newReading.content || []
+                    // );
                     setLoadingContent(false);
 
                 }

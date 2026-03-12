@@ -3,7 +3,6 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useNavigate } from "react-router-dom";
 import ChatAgent from "../classes/ChatAgent";
-import AppStorage from "../classes/AppStorage";
 
 function HitRateLimitPage() {
     const navigate = useNavigate();
@@ -18,7 +17,7 @@ function HitRateLimitPage() {
         const isValid = await ChatAgent.testKey(newKey);
         console.log("API key validation result:", isValid);
         if (isValid) {
-            AppStorage.updateUserApiKey(newKey);
+            // AppStorage.updateUserApiKey(newKey);
             navigate("/"); // Redirect to home or previous page
         } else {
             alert("Invalid API key. Please check and try again.");
@@ -26,7 +25,7 @@ function HitRateLimitPage() {
     };
 
     const onRefresh = async () => {
-        const rateLimitLifted = await ChatAgent.testKey(AppStorage.getUser()?.apiKey || ""); // Trigger a test to see if the key is now valid
+        const rateLimitLifted = await ChatAgent.testKey(/*AppStorage.getUser()?.apiKey || */""); // Trigger a test to see if the key is now valid
         if (rateLimitLifted) {
             navigate("/"); // Redirect to home or previous page if rate limit is lifted
         } else {

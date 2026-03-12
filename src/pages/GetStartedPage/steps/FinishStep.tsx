@@ -1,7 +1,6 @@
 import { Button } from "primereact/button";
 import type { StepComponentProps } from "../GetStartedPage";
-import type { Course, User } from "../../../classes/AguDatabase";
-import AppStorage from "../../../classes/AppStorage";
+import { aguDb, type Course, type User } from "../../../classes/AguDatabase";
 import ChatAgent from "../../../classes/ChatAgent";
 import { useState } from "react";
 
@@ -9,17 +8,18 @@ export default function FinishStep(props: StepComponentProps) {
     const [loading, setLoading] = useState(false);
 
     const getStarted = async () => {
-        const user: User = {
-            apiKey,
-            major,
-            model,
-        }
-        AppStorage.saveUser(user);
-        const agent = new ChatAgent(apiKey);
-        const courses: Course[] = await agent.createCourses(major);
-        AppStorage.saveCourses(courses);
+        setLoading(true);
+        const createUserForm: Omit<User, "id"> = props.data as Omit<User, "id">;
 
-        props.onComplete();
+        await aguDb.createUser(createUserForm);
+        const user: User = await aguDb.getUser();
+        const agent = new ChatAgent(user.apiKey);
+        const courses: Course[] = await agent.createPlanOfStudy(user.major);
+        // Clear & load new courses
+        await aguDb.courses.clear();
+        await aguDb.courses.bulkAdd(courses);
+        setLoading(false);
+        props.onComplete({});
     };
 
     return (

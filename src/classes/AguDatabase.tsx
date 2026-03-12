@@ -1,11 +1,11 @@
 import Dexie from "dexie";
+import AppAuth from "./AppAuth";
 
 export enum SupportedModels {
     GEMINI = "gemini",
 };
-const USER_DB_SCHEMA = "id,apiKey,firstName,major,model";
+const USER_DB_SCHEMA = "apiKey,firstName,major,model";
 export interface User {
-    id: string;
     apiKey: string;
     firstName: string;
     lastName?: string;
@@ -13,14 +13,14 @@ export interface User {
     model: SupportedModels;
 };
 
-const YEAR_DB_SCHEMA = "id,name,&index";
+const YEAR_DB_SCHEMA = "++id,name,&index";
 export interface Year {
     id: string;
     name: string;
     index: number;
 }
 
-const COURSE_DB_SCHEMA = "id,yearId,name,description,type";
+const COURSE_DB_SCHEMA = "++id,yearId,name,description,type";
 export interface Course {
     id: string;
     yearId: string;
@@ -29,14 +29,14 @@ export interface Course {
     type: "core" | "elective";
 };
 
-const UNIT_DB_SCHEMA = "id,courseId,name";
+const UNIT_DB_SCHEMA = "++id,courseId,name";
 export interface Unit {
     id: string;
     courseId: string;
     name: string;
 };
 
-const READING_DB_SCHEMA = "id,unitId,title,description,read,content";
+const READING_DB_SCHEMA = "++id,unitId,title,description,read,content";
 export interface Reading {
     id: string;
     unitId: string;
@@ -50,8 +50,8 @@ export class AguDatabase extends Dexie {
     users!: Dexie.Table<User, number>;
     years!: Dexie.Table<Year, number>;
     courses!: Dexie.Table<Course, number>;
-    Units!: Dexie.Table<Unit, number>;
-    Readings!: Dexie.Table<Reading, number>;
+    units!: Dexie.Table<Unit, number>;
+    readings!: Dexie.Table<Reading, number>;
 
     constructor(version: number = 1) {
         super("AguDatabase");
@@ -59,8 +59,8 @@ export class AguDatabase extends Dexie {
             users: USER_DB_SCHEMA,
             years: YEAR_DB_SCHEMA,
             courses: COURSE_DB_SCHEMA,
-            Units: UNIT_DB_SCHEMA,
-            Readings: READING_DB_SCHEMA,
+            units: UNIT_DB_SCHEMA,
+            readings: READING_DB_SCHEMA,
         });
     }
 
@@ -79,16 +79,17 @@ export class AguDatabase extends Dexie {
             console.warn("User already exists. Overwriting existing user.");
             await this.users.clear();
         }
-        await this.users.add({
-            id: crypto.randomUUID(),
-            ...newUsr,
-        });
+
+        await this.users.add(newUsr);
+
+        AppAuth.login();
+        console.log("User created and logged in: ", newUsr.firstName);
     }
-    async getUser(): Promise<User | null> {
+    async getUser(): Promise<User> {
         const users: User[] = await this.users.toArray();
         if(users.length === 0) {
-            console.warn("No user found in database.");
-            return null;
+            AppAuth.logout();
+            throw new Error("No user found in database.");
         }
         else if(users.length > 1) {
             console.warn("Multiple users found in database. This should not happen; returning the first user & deleting the rest.");
@@ -96,15 +97,10 @@ export class AguDatabase extends Dexie {
         }
         return users[0];
     }
-
-    // COURSE METHODS
-    async addCourse(newCourse: Omit<Course, "id">): Promise<void> {
-        await this.courses.add({
-            id: crypto.randomUUID(),
-            ...newCourse,
-        });
-    }
-    async getCourses(): Promise<Course[]> {
-        return await this.courses.toArray();
+    async getUserApiKey(): Promise<string> {
+        const user = await this.getUser();
+        return user.apiKey;
     }
 };
+
+export const aguDb = new AguDatabase();

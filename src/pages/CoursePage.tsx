@@ -1,17 +1,15 @@
 import { useNavigate, useParams } from "react-router-dom";
-import "./CoursePage.scss"
 import { useEffect, useState } from "react";
-import AppStorage from "../classes/AppStorage";
-import { evalCourseProgress, evalUnitProgress, getCourseLabel } from "../utils";
+import { evalUnitProgress } from "../utils";
 import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import type { Course, Unit } from "../classes/AguDatabase";
+import { aguDb, type Course, type Unit } from "../classes/AguDatabase";
 
 function CoursePage() {
-    let { courseIndex } = useParams();
+    let { courseId } = useParams();
     const navigate = useNavigate();
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
@@ -21,9 +19,9 @@ function CoursePage() {
         let newUnits: Unit[] = [];
         setLoadingContent(true);
         if(course) {
-            const chatAgent = new ChatAgent(AppStorage.getUser()?.apiKey || "");
+            const apiKey = await aguDb.getUserApiKey();
+            const chatAgent = new ChatAgent(apiKey);
             newUnits = await chatAgent.createUnits(course);
-            setLoadingContent(false);
         }
         setLoadingContent(false);
         return newUnits;
@@ -31,44 +29,46 @@ function CoursePage() {
 
     useEffect(() => {
         (async function() {
-            const courses: Course[] | null = AppStorage.getCourses();
-            if(!courseIndex || !courses) {
-                alert(`Error: Could not find this course`);
-                navigate("/");
+            const retrievedCourse: Course | undefined = await aguDb.courses.get(parseInt(courseId || ""));
+
+            if(!retrievedCourse) {
+                alert("Course not found.");
+                navigate("/plan-of-study");
+                return;
             }
             else {
-                const index = parseInt(courseIndex);
-                if(!isNaN(index) && index >= 0 && index < courses.length) {
-                    setCourse(courses[index]);
-                }
+                setCourse(retrievedCourse);
             }
         })();
-    }, [courseIndex]);
+    }, [courseId]);
 
     useEffect(() => {
         (async () => {
-            if(course?.units?.length) {
-                setUnits(course.units);
+            if(!course) return;
+
+            let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(parseInt(courseId || "")).toArray();
+
+            // If no units exist, create them & throw them in the databse
+            if(!retrievedUnits?.length) {
+                retrievedUnits = await createNewUnits(course);
+                aguDb.units.bulkAdd(retrievedUnits);   
             }
-            else if(course) {
-                const newUnits: Unit[] = await createNewUnits(course);
-                AppStorage.addCourseUnits(course, newUnits);
-                setUnits(newUnits);
-            }
+            
+            setUnits(retrievedUnits);
         })();
     }, [course]);
     
     return (
         <div>
             <Button label="Plan of Study" onClick={() => navigate("/plan-of-study")} icon="pi pi-chevron-left" />
-            <h1>{course ? getCourseLabel(course, parseInt(courseIndex || "0")) : ""}</h1>
-            <h2>{course?.description}</h2>
-            <ProgressBar
+            <h1 className="m-2">{course?.name}</h1>
+            <h3 className="m-4">{course?.description}</h3>
+            {/* <ProgressBar
                 value={evalCourseProgress(course)}
-            ></ProgressBar>
-            <h2>Curriculum</h2>
+            ></ProgressBar> */}
+            <h2 className="m-2">Curriculum</h2>
             {loadingContent ? (
-                <div className="loading-content">
+                <div>
                     <ProgressSpinner />
                 </div>
             ) : (
@@ -77,11 +77,11 @@ function CoursePage() {
                         <AccordionTab
                             key={index}
                             header={
-                                <div className="unit-header">
-                                    <span className="unit-header-text">
+                                <div>
+                                    <span>
                                         {unit.name}
                                     </span>
-                                    <div className="unit-header-progress">
+                                    <div>
                                         <ProgressBar
                                             value={evalUnitProgress(unit)}
                                         ></ProgressBar>
@@ -91,7 +91,7 @@ function CoursePage() {
                             // disabled={!unit.unlocked}
                         >
                             <h3>{unit.name}</h3>
-                            {unit.readings.map((reading, rIndex, array) => (
+                            {/* {unit.readings.map((reading, rIndex, array) => (
                                 <div key={rIndex}>
                                     <h4>Reading {rIndex + 1} - {reading.title}</h4>
                                     <h5>{reading.description}</h5>
@@ -103,7 +103,7 @@ function CoursePage() {
                                         disabled={rIndex > 0 && array[rIndex - 1].read === false}
                                     />
                                 </div>
-                            ))}
+                            ))} */}
                         </AccordionTab>
                     ))}
                 </Accordion>

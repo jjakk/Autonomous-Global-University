@@ -13,23 +13,15 @@ import CoursePage from './pages/CoursePage.tsx';
 import ReadingPage from './pages/ReadingPage.tsx';
 
 function RootScreen() {
-  const authenticated = AppAuth.isAuthenticated();
-  return authenticated ? <Navigate to="/plan-of-study" /> : <Navigate to="/get-started" />;
+  return AppAuth.isAuthenticated() ? <Navigate to="/plan-of-study" /> : <Navigate to="/get-started" />;
 }
 
 function AuthenticatedOnlyRoutes () {
-  const authenticated = AppAuth.isAuthenticated();
-  if(!authenticated) {
-    return <Navigate to="/get-started" />;
-  }
-  else {
-    return <Outlet />;
-  }
+  return AppAuth.isAuthenticated() ? <Outlet /> : <Navigate to="/get-started" />
 }
 
 function UnauthenticatedOnlyRoutes () {
-  const authenticated = AppAuth.isAuthenticated();
-  return !authenticated ? <Outlet /> : <Navigate to="/plan-of-study" />;
+  return AppAuth.isAuthenticated() ? <Navigate to="/plan-of-study" /> : <Outlet /> ;
 }
 
 let router = createBrowserRouter([
@@ -61,11 +53,11 @@ let router = createBrowserRouter([
             element: <HitRateLimitPage />,
           },
           {
-            path: "/course/:courseIndex",
+            path: "/course/:courseId",
             element: <CoursePage />
           },
           {
-            path: "/course/:courseIndex/unit/:unitIndex/reading/:readingIndex",
+            path: "/course/:courseId/unit/:unitIndex/reading/:readingIndex",
             element: <ReadingPage />
           },
         ]
