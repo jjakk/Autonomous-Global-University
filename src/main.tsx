@@ -57,7 +57,7 @@ let router = createBrowserRouter([
             element: <CoursePage />
           },
           {
-            path: "/course/:courseId/unit/:unitIndex/reading/:readingIndex",
+            path: "/course/:courseId/unit/:unitId/reading/:readingId",
             element: <ReadingPage />
           },
         ]

@@ -7,6 +7,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { aguDb, type Course, type Unit } from "../classes/AguDatabase";
+import UnitPreview from "../components/UnitPreview";
 
 function CoursePage() {
     let { courseId } = useParams();
@@ -53,20 +54,19 @@ function CoursePage() {
                 retrievedUnits = await createNewUnits(course);
                 aguDb.units.bulkAdd(retrievedUnits);   
             }
-            
+
             setUnits(retrievedUnits);
         })();
     }, [course]);
     
     return (
         <div>
-            <Button label="Plan of Study" onClick={() => navigate("/plan-of-study")} icon="pi pi-chevron-left" />
-            <h1 className="m-2">{course?.name}</h1>
+            <div className="flex flex-row items-center gap-4 m-4">
+                <Button onClick={() => navigate("/plan-of-study")} icon="pi pi-chevron-left" rounded />
+                <h1>{course?.name}</h1>
+            </div>
             <h3 className="m-4">{course?.description}</h3>
-            {/* <ProgressBar
-                value={evalCourseProgress(course)}
-            ></ProgressBar> */}
-            <h2 className="m-2">Curriculum</h2>
+            <h2 className="m-4">Curriculum</h2>
             {loadingContent ? (
                 <div>
                     <ProgressSpinner />
@@ -77,33 +77,20 @@ function CoursePage() {
                         <AccordionTab
                             key={index}
                             header={
-                                <div>
-                                    <span>
+                                <div className="flex flex-row items-center gap-2">
+                                    <span className="flex-1">
                                         {unit.name}
                                     </span>
-                                    <div>
+                                    <div className="flex-1">
                                         <ProgressBar
                                             value={evalUnitProgress(unit)}
                                         ></ProgressBar>
                                     </div>
                                 </div>
                             }
-                            // disabled={!unit.unlocked}
                         >
                             <h3>{unit.name}</h3>
-                            {/* {unit.readings.map((reading, rIndex, array) => (
-                                <div key={rIndex}>
-                                    <h4>Reading {rIndex + 1} - {reading.title}</h4>
-                                    <h5>{reading.description}</h5>
-                                    <Button
-                                        label={"View Reading " + (reading.read ? "(Complete)" : "(Incomplete)")}
-                                        onClick={() => navigate(`/course/${courseIndex}/unit/${index}/reading/${rIndex}`)}
-                                        severity="success"
-                                        outlined={!reading.read}
-                                        disabled={rIndex > 0 && array[rIndex - 1].read === false}
-                                    />
-                                </div>
-                            ))} */}
+                            <UnitPreview unit={unit} />
                         </AccordionTab>
                     ))}
                 </Accordion>

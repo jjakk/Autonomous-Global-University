@@ -74,15 +74,19 @@ function GetStartedPage() {
         {checklist.map((step: Step, index: number) => (
           <TabPanel key={index} header={step.label} disabled={index !== activeIndex}>
             <div className="flex flex-col gap-4 items-start">
-              {index > 0 ? (
-                <Button
-                  label="Back"
-                  onClick={() => setActiveIndex(activeIndex - 1)}
-                  severity="secondary"
-                  icon="pi pi-arrow-left"
-                />
-              ) : (<></>)}
-              {step.description && <h2>{step.description}</h2>}
+              <div className="flex flex-row items-center gap-4">
+                {index > 0 ? (
+                  <Button
+                    onClick={() => setActiveIndex(activeIndex - 1)}
+                    severity="secondary"
+                    icon="pi pi-chevron-left"
+                    className="shrink-0"
+                    rounded
+                  />
+                ) : (<></>)}
+                {step.description && <h2>{step.description}</h2>}
+              </div>
+              <hr className="border-gray-100 border-1 my-2 w-full"></hr>
               <step.RenderComponent
                 data={newUser}
                 description={step.description}

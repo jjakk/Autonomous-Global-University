@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+import z from "zod";
 import AppAuth from "./AppAuth";
 
 export enum SupportedModels {
@@ -20,6 +21,7 @@ export interface Year {
     index: number;
 }
 
+// COURSE types & schemas
 const COURSE_DB_SCHEMA = "++id,yearId,name,description,type";
 export interface Course {
     id: string;
@@ -28,14 +30,46 @@ export interface Course {
     description: string;
     type: "core" | "elective";
 };
+export const coursesSchema: z.ZodType = z.array(z.object({
+    name: z.string(),
+    description: z.string(),
+    type: z.enum(["core", "elective"]),
+}));
+export const coursesSchema_JSON = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "name": { "type": "string" },
+            "description": { "type": "string" },
+            "type": { "type": "string", "enum": ["core", "elective"] }
+        },
+        "required": ["name", "description", "type"]
+    }
+};
 
+// UNIT types & schemas
 const UNIT_DB_SCHEMA = "++id,courseId,name";
 export interface Unit {
     id: string;
     courseId: string;
     name: string;
 };
+export const unitsSchema: z.ZodType = z.array(z.object({
+    name: z.string(),
+}));
+export const unitsSchema_JSON = {
+    type: "array",
+    items: {
+        type: "object",
+        properties: {
+            name: { type: "string" },
+        },
+        required: ["name"]
+    }
+};
 
+// READING types & schemas
 const READING_DB_SCHEMA = "++id,unitId,title,description,read,content";
 export interface Reading {
     id: string;
@@ -44,6 +78,21 @@ export interface Reading {
     description: string;
     read?: boolean;
     content?: string[];
+};
+export const readingSchema: z.ZodType = z.object({
+    title: z.string(),
+    description: z.string(),
+    content: z.array(z.string()).optional(),
+    read: z.boolean().optional()
+});
+export const readingSchema_JSON = {
+    type: "object",
+    properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
+    },
+    required: ["title", "description"]
 };
 
 export class AguDatabase extends Dexie {
