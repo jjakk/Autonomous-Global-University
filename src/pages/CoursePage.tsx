@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { evalUnitProgress } from "../utils";
 import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -8,56 +7,52 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { aguDb, type Course, type Unit } from "../classes/AguDatabase";
 import UnitPreview from "../components/UnitPreview";
+import { useAsyncLoading } from "../hooks";
 
 function CoursePage() {
     let { courseId } = useParams();
     const navigate = useNavigate();
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
-    const [loadingContent, setLoadingContent] = useState<boolean>(false);
 
     const createNewUnits = async (course: Course): Promise<Unit[]> => {
-        let newUnits: Unit[] = [];
-        setLoadingContent(true);
-        if(course) {
-            const apiKey = await aguDb.getUserApiKey();
-            const chatAgent = new ChatAgent(apiKey);
-            newUnits = await chatAgent.createUnits(course);
-        }
-        setLoadingContent(false);
-        return newUnits;
+        const apiKey = await aguDb.getUserApiKey();
+        const chatAgent = new ChatAgent(apiKey);
+
+        const newUnits = await chatAgent.createUnits(course);
+        await aguDb.units.bulkAdd(newUnits as Unit[]);
+        
+        return await aguDb.units.toArray();
     };
 
-    useEffect(() => {
-        (async function() {
-            const retrievedCourse: Course | undefined = await aguDb.courses.get(parseInt(courseId || ""));
+    const _retreiveCourse = async (courseId: number): Promise<void> => {
+        const retrievedCourse: Course | undefined = await aguDb.courses.get(courseId);
+        if(!retrievedCourse) {
+            alert("Course not found.");
+            navigate("/plan-of-study");
+        }
+        else {
+            setCourse(retrievedCourse);
+        }
+    };
+    const _retreiveUnits = async (course: Course, courseId: number): Promise<void> => {
+        let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(courseId).toArray();
 
-            if(!retrievedCourse) {
-                alert("Course not found.");
-                navigate("/plan-of-study");
-                return;
-            }
-            else {
-                setCourse(retrievedCourse);
-            }
-        })();
-    }, [courseId]);
+        if(!retrievedUnits?.length) {
+            console.warn("No units found for course. Creating units...");
+            retrievedUnits = await createNewUnits(course);
+            console.log("Units created and loaded to database: ", retrievedUnits);
+        }
 
-    useEffect(() => {
-        (async () => {
-            if(!course) return;
+        setUnits(retrievedUnits);
+    };
 
-            let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(parseInt(courseId || "")).toArray();
+    const { loading: loadingCourse, wrapped: retreiveCourse } = useAsyncLoading(_retreiveCourse);
+    const { loading: loadingUnits, wrapped: retreiveUnits } = useAsyncLoading(_retreiveUnits);
+    const loadingContent = loadingCourse || loadingUnits;
 
-            // If no units exist, create them & throw them in the databse
-            if(!retrievedUnits?.length) {
-                retrievedUnits = await createNewUnits(course);
-                aguDb.units.bulkAdd(retrievedUnits);   
-            }
-
-            setUnits(retrievedUnits);
-        })();
-    }, [course]);
+    useEffect(() => { courseId ? retreiveCourse(parseInt(courseId)) : null}, [courseId]);
+    useEffect(() => { course ? retreiveUnits(course, parseInt(course.id)) : null }, [course]);
     
     return (
         <div>
@@ -83,7 +78,8 @@ function CoursePage() {
                                     </span>
                                     <div className="flex-1">
                                         <ProgressBar
-                                            value={evalUnitProgress(unit)}
+                                            // value={evalUnitProgress(unit)}
+                                            value={0}
                                         ></ProgressBar>
                                     </div>
                                 </div>

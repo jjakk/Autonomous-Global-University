@@ -1,6 +1,7 @@
 import Dexie from "dexie";
 import z from "zod";
 import AppAuth from "./AppAuth";
+import { de } from "zod/locales";
 
 export enum SupportedModels {
     GEMINI = "gemini",
@@ -36,15 +37,15 @@ export const coursesSchema: z.ZodType = z.array(z.object({
     type: z.enum(["core", "elective"]),
 }));
 export const coursesSchema_JSON = {
-    "type": "array",
-    "items": {
-        "type": "object",
-        "properties": {
-            "name": { "type": "string" },
-            "description": { "type": "string" },
-            "type": { "type": "string", "enum": ["core", "elective"] }
+    type: "array",
+    items: {
+        type: "object",
+        properties: {
+            name: { type: "string" },
+            description: { type: "string" },
+            type: { type: "string", "enum": ["core", "elective"] }
         },
-        "required": ["name", "description", "type"]
+        required: ["name", "description", "type"]
     }
 };
 
@@ -54,18 +55,23 @@ export interface Unit {
     id: string;
     courseId: string;
     name: string;
+    description: string;
 };
-export const unitsSchema: z.ZodType = z.array(z.object({
-    name: z.string(),
-}));
+export const unitsSchema: z.ZodType = z.array(
+    z.object({
+        name: z.string(),
+        description: z.string(),
+    })
+);
 export const unitsSchema_JSON = {
     type: "array",
     items: {
         type: "object",
         properties: {
             name: { type: "string" },
+            description: { type: "string" },
         },
-        required: ["name"]
+        required: ["name", "description"]
     }
 };
 
@@ -76,23 +82,27 @@ export interface Reading {
     unitId: string;
     title: string;
     description: string;
-    read?: boolean;
-    content?: string[];
+    content: string[];
+    read: boolean;
 };
-export const readingSchema: z.ZodType = z.object({
-    title: z.string(),
-    description: z.string(),
-    content: z.array(z.string()).optional(),
-    read: z.boolean().optional()
-});
-export const readingSchema_JSON = {
-    type: "object",
-    properties: {
-        title: { type: "string" },
-        description: { type: "string" },
-        content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
-    },
-    required: ["title", "description"]
+export const readingsSchema: z.ZodType = z.array(
+    z.object({
+        title: z.string(),
+        description: z.string(),
+        content: z.array(z.string())
+    })
+);
+export const readingsSchema_JSON = {
+    type: "array",
+    items: {
+        type: "object",
+        properties: {
+            title: { type: "string" },
+            description: { type: "string" },
+            content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
+        },
+        required: ["title", "description", "content"]
+    }
 };
 
 export class AguDatabase extends Dexie {

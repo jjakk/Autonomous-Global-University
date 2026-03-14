@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import "./ReadingPage.scss";
 import { useEffect, useState } from "react";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";

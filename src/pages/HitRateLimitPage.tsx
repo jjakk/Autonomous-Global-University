@@ -1,4 +1,3 @@
-import "./HitRateLimitPage.scss";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useNavigate } from "react-router-dom";
