@@ -1,10 +1,11 @@
 import type { Course } from "./classes/AguDatabase";
 
 export const calculateCourseCode = (index: number): number => {
-    return parseInt(`${Math.ceil((index + 2) / 10)}0${(index+1) % 10}`);
+    return parseInt(`${Math.ceil((index + 1) / 10)}0${index % 10}`);
 }
 
-export const getCourseLabel = (course: Course, index: number): string => {
+export const getCourseLabel = (course: Course): string => {
+    const index = parseInt(course.id);
     const courseCode = calculateCourseCode(index);
     return `Course ${courseCode}: ${course.name}`;
 }

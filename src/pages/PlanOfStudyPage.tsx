@@ -20,7 +20,7 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
                 <div key={course.name} className="flex justify-content-between align-items-center gap-5 mb-3" >
                     <div className="flex-1">
                         <h2>
-                            <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course, index)}</a>
+                            <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course)}</a>
                         </h2>
                         <h4 className="m-4">{course.description}</h4>
                     </div>
@@ -92,11 +92,10 @@ function PlanOfStudyPage() {
     }, []);
 
     return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
-        <div className="flex flex-col items-start gap-10">
+        <div className="flex flex-col items-start gap-4">
             <h1 className="m-2">{getGreeting(user.firstName)}</h1>
             <div className="flex flex-row gap-10 items-start">
                 <Section title="Plan of Study" className="flex-3">
-                    {/* <h1 className="m-2"></h1> */}
                     <TabView>
                         {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
                             <TabPanel key={year} header={year + " Year"}>
@@ -106,28 +105,29 @@ function PlanOfStudyPage() {
                     </TabView>
                 </Section>
                 <div className="flex flex-col flex-2 gap-10">
-                    <Section title="Progress" centerTitle>
+                    <Section title="Course of Study Progress" centerTitle>
                         <div className="flex flex-col flex-1 items-center gap-5 mt-5">
                             <Knob
                                 value={10}
                                 size={150}
+                                valueTemplate={'{value}%'}
                                 readOnly
                             />
                         </div>
                         <div className="flex-1-gray-100 p-5 border-round">
-                            <h3 className="m-2">Freshman</h3>
+                            <h3 className="m-2">Freshman Year</h3>
                             <ProgressBar
                                 value={20}
                             ></ProgressBar>
-                            <h3 className="m-2">Sophomore</h3>
+                            <h3 className="m-2">Sophomore Year</h3>
                             <ProgressBar
-                                value={10}
+                                value={0}
                             ></ProgressBar>
-                            <h3 className="m-2">Junior</h3>
+                            <h3 className="m-2">Junior Year</h3>
                             <ProgressBar
-                                value={5}
+                                value={0}
                             ></ProgressBar>
-                            <h3 className="m-2">Senior</h3>
+                            <h3 className="m-2">Senior Year</h3>
                             <ProgressBar
                                 value={0}
                             ></ProgressBar>

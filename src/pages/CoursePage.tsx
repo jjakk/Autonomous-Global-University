@@ -1,13 +1,18 @@
+import "./CoursePage.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { aguDb, type Course, type Unit } from "../classes/AguDatabase";
 import UnitPreview from "../components/UnitPreview";
 import { useAsyncLoading } from "../hooks";
 import { PageLoading } from "../components/PageLoading";
+import Section from "../components/Section";
+
+import { Stepper } from 'primereact/stepper';
+import { StepperPanel } from 'primereact/stepperpanel';
+import { getCourseLabel } from "../utils";
+        
 
 function CoursePage() {
     let { courseId } = useParams();
@@ -53,7 +58,7 @@ function CoursePage() {
 
     const { loading: loadingCourse, wrapped: retreiveCourse } = useAsyncLoading(_retreiveCourse);
     const { loading: loadingUnits, wrapped: retreiveUnits } = useAsyncLoading(_retreiveUnits);
-    const loadingContent = loadingCourse || loadingUnits;
+    const loadingContent = loadingCourse || loadingUnits || !course;
 
     useEffect(() => {
         if(courseId) {
@@ -78,32 +83,23 @@ function CoursePage() {
                     onClick={() => navigate("/plan-of-study")}
                     icon="pi pi-chevron-left"
                 />
-                <h1>{course?.name}</h1>
-                <h3 className="ml-4">{course?.description}</h3>
+                {/* <h1 className="ml-4">{course?.name}</h1>
+                <h3 className="ml-4">{course?.description}</h3> */}
             </div>
-            <Accordion>
-                {units.map((unit, index) => (
-                    <AccordionTab
-                        key={index}
-                        header={
-                            <div className="flex flex-row items-center gap-2">
-                                <span className="flex-1">
-                                    {unit.name}
-                                </span>
-                                <div className="flex-1">
-                                    <ProgressBar
-                                        // value={evalUnitProgress(unit)}
-                                        value={0}
-                                    ></ProgressBar>
-                                </div>
-                            </div>
-                        }
-                    >
-                        <h3>{unit.name}</h3>
-                        <UnitPreview unit={unit} />
-                    </AccordionTab>
-                ))}
-            </Accordion>
+            <Section title={getCourseLabel(course)} subtitle={course?.description}>
+                <h2 className="m-4">Curriculum</h2>
+                <Stepper orientation="vertical">
+                    {units.map((unit) => (
+                        <StepperPanel
+                            key={unit.name}
+                            header={unit.name}
+                        >
+                            <h1>{unit.name}</h1>
+                            <UnitPreview unit={unit} />
+                        </StepperPanel>
+                    ))}
+                </Stepper>
+            </Section>
         </div>
     );
 }

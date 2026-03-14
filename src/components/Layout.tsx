@@ -7,23 +7,31 @@ import { Dropdown } from "primereact/dropdown";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { InputTextarea } from "primereact/inputtextarea";
 import AppAuth from "../classes/AppAuth";
-import type { Course } from "../classes/AguDatabase";
-
+import { aguDb, type Course } from "../classes/AguDatabase";
+import { useAsyncLoading } from "../hooks";
+import { getCourseLabel } from "../utils";
 
 function AppHeader() {
-    let { courseIndex } = useParams();
+    let { courseId } = useParams();
     const op = useRef<OverlayPanel>(null);
-    const [taCourse, setTaCourse] = useState<Course | null>(null);
-    const courses: Course[] = /*AppStorage.getCourses() ||*/ [];
+    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
+
+    const _updateCourseSelection = async (courseId: string) => {
+        const ac: Course[] = await aguDb.courses.toArray();
+        setAvailableCourses(ac);
+        if(courseId && ac.length > 0) {
+            const courseFound: Course | null = ac.find(c => c.id == courseId) || null;
+            setSelectedCourse(courseFound);
+        }
+    };
+    const { loading, wrapped: updateCourseSelection } = useAsyncLoading(_updateCourseSelection);
 
     useEffect(() => {
-        if(courseIndex && courses.length > 0) {
-            const index = parseInt(courseIndex);
-            if(!isNaN(index) && index >= 0 && index < courses.length) {
-                setTaCourse(courses[index]);
-            }
+        if(courseId) {
+            updateCourseSelection(courseId);
         }
-    }, [courseIndex]);
+    }, [courseId]);
 
     return (
         <header className="nav-header">
@@ -44,12 +52,22 @@ function AppHeader() {
                 <div className="nav-header-right">
                     <Button type="button" icon="pi pi-info-circle" label="Teaching Assistant" onClick={(e) => op.current?.toggle(e)} />
                     <OverlayPanel ref={op} dismissable={false} className="ta-interaction-box">
-                        <Dropdown value={taCourse} onChange={(e) => setTaCourse(e.value)} options={courses} optionLabel="name" placeholder="Select a Course" className="w-full md:w-14rem" />
-                        {taCourse && (
+                        <Dropdown
+                            value={selectedCourse}
+                            onChange={(e) => setSelectedCourse(e.value)}
+                            options={availableCourses}
+                            optionLabel="name"
+                            itemTemplate={(option) => (<>{getCourseLabel(option)}</>)}
+                            valueTemplate={(option) => (<>{getCourseLabel(option)}</>)}
+                            placeholder={loading ? "Loading..." : "Select a Course"}
+                            className="w-full md:w-14rem"
+                            disabled={loading}
+                        />
+                        {selectedCourse && (
                             <div>
                                 <ScrollPanel style={{ width: '100%', height: '200px' }}>
                                     <div className="ta-chat-history">
-                                        <p className="chat-bubble ta-response">Hey, I'll be your TA for {taCourse.name}, let me know if you have any questions!</p>
+                                        <p className="chat-bubble ta-response">Hey, I'll be your TA for {selectedCourse.name}, let me know if you have any questions!</p>
                                         {/* <p className="chat-bubble student-response">Example user response</p> */}
                                     </div>
                                 </ScrollPanel>

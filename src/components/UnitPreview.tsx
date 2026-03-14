@@ -5,6 +5,7 @@ import ChatAgent from "../classes/ChatAgent";
 import { useAsyncLoading } from "../hooks";
 import { Button } from "primereact/button";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { PageLoading } from "./PageLoading";
 
 interface UnitPreviewProps {
     unit: Unit;
@@ -46,14 +47,10 @@ export default function UnitPreview(props: UnitPreviewProps) {
         retreiveReadings(props.unit);
     }, []);
 
-    return (
-        <>
-            {loading ? (
-                <div className="flex flex-row items-center gap-4 m-4">
-                    <ProgressSpinner />
-                </div>
-            ) : readings.map((reading, rIndex) => (
-                <div key={reading.title} className="flex flex-col items-start gap-2 m-4">
+    return loading ? PageLoading() : (
+        <div className="flex flex-col items-start gap-4 mt-4">
+            {readings.map((reading, rIndex) => (
+                <div key={reading.title} className="flex flex-col items-start gap-4">
                     <h3>Reading {rIndex + 1} - {reading.title}</h3>
                     <h5>{reading.description}</h5>
                     <Button
@@ -64,6 +61,6 @@ export default function UnitPreview(props: UnitPreviewProps) {
                     />
                 </div>
             ))}
-        </>
+        </div>
     );
 };
