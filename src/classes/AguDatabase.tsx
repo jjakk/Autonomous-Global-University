@@ -108,43 +108,6 @@ export const readingsSchema_JSON = {
     }
 };
 
-// export const unitsWithReadingsSchema = z.array(
-//     z.object({
-//         name: z.string(),
-//         description: z.string(),
-//         readings: z.array(
-//             z.object({
-//                 title: z.string(),
-//                 description: z.string(),
-//                 content: z.array(z.string())
-//             })
-//         )
-//     })
-// );
-// export const unitsWithReadingsSchema_JSON = {
-//     type: "array",
-//     items: {
-//         type: "object",
-//         properties: {
-//             name: { type: "string" },
-//             description: { type: "string" },
-//             readings: {
-//                 type: "array",
-//                 items: {
-//                     type: "object",
-//                     properties: {
-//                         title: { type: "string" },
-//                         description: { type: "string" },
-//                         content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
-//                     },
-//                     required: ["title", "description", "content"]
-//                 }
-//             }
-//         },
-//         required: ["name", "description", "readings"]
-//     }
-// };
-
 export class AguDatabase extends Dexie {
     users!: Dexie.Table<User, number>;
     years!: Dexie.Table<Year, number>;

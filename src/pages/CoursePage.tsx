@@ -2,12 +2,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { aguDb, type Course, type Unit } from "../classes/AguDatabase";
 import UnitPreview from "../components/UnitPreview";
 import { useAsyncLoading } from "../hooks";
+import { PageLoading } from "../components/PageLoading";
 
 function CoursePage() {
     let { courseId } = useParams();
@@ -70,43 +70,40 @@ function CoursePage() {
         };
     }, [course]);
     
-    return (
-        <div>
-            <div className="flex flex-row items-center gap-4 m-4">
-                <Button onClick={() => navigate("/plan-of-study")} icon="pi pi-chevron-left" rounded />
+    return loadingContent ? PageLoading() : (
+        <div className="flex flex-col items-stretch gap-4">
+            <div className="flex flex-col items-start gap-4">
+                <Button
+                    label="Back to Plan of Study"
+                    onClick={() => navigate("/plan-of-study")}
+                    icon="pi pi-chevron-left"
+                />
                 <h1>{course?.name}</h1>
+                <h3 className="ml-4">{course?.description}</h3>
             </div>
-            <h3 className="m-4">{course?.description}</h3>
-            <h2 className="m-4">Curriculum</h2>
-            {loadingContent ? (
-                <div>
-                    <ProgressSpinner />
-                </div>
-            ) : (
-                <Accordion>
-                    {units.map((unit, index) => (
-                        <AccordionTab
-                            key={index}
-                            header={
-                                <div className="flex flex-row items-center gap-2">
-                                    <span className="flex-1">
-                                        {unit.name}
-                                    </span>
-                                    <div className="flex-1">
-                                        <ProgressBar
-                                            // value={evalUnitProgress(unit)}
-                                            value={0}
-                                        ></ProgressBar>
-                                    </div>
+            <Accordion>
+                {units.map((unit, index) => (
+                    <AccordionTab
+                        key={index}
+                        header={
+                            <div className="flex flex-row items-center gap-2">
+                                <span className="flex-1">
+                                    {unit.name}
+                                </span>
+                                <div className="flex-1">
+                                    <ProgressBar
+                                        // value={evalUnitProgress(unit)}
+                                        value={0}
+                                    ></ProgressBar>
                                 </div>
-                            }
-                        >
-                            <h3>{unit.name}</h3>
-                            <UnitPreview unit={unit} />
-                        </AccordionTab>
-                    ))}
-                </Accordion>
-            )}
+                            </div>
+                        }
+                    >
+                        <h3>{unit.name}</h3>
+                        <UnitPreview unit={unit} />
+                    </AccordionTab>
+                ))}
+            </Accordion>
         </div>
     );
 }

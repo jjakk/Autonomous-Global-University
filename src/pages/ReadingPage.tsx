@@ -1,20 +1,19 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ProgressSpinner } from "primereact/progressspinner";
-import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
-import { getCourseLabel } from "../utils";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { aguDb, type Reading, type Unit } from "../classes/AguDatabase";
+import { aguDb, type Course, type Reading } from "../classes/AguDatabase";
 import { useAsyncLoading } from "../hooks";
+import { PageLoading } from "../components/PageLoading";
 
 function ReadingPage() {
     let { courseId, readingId } = useParams();
     const navigate = useNavigate();
     const ranOnLoad = useRef(false);
 
+    const [course, setCourse] = useState<Course | null>(null);
     const [reading, setReading] = useState<Reading | null>(null);
 
     const markAsRead = async () => {
@@ -24,6 +23,16 @@ function ReadingPage() {
         }
     };
 
+    const _retreiveCourse = async (cId: number) => {
+        const crs = !isNaN(cId) ? await aguDb.courses.get(cId) : undefined;
+        if(!crs) {
+            alert("Course not found.");
+            navigate("/");
+        }
+        else {
+            setCourse(crs);
+        }
+    };
     const _retreiveReading = async (rId: number) => {
         const rd: Reading | undefined = !isNaN(rId)
             ? await aguDb.readings.get(rId)
@@ -37,77 +46,72 @@ function ReadingPage() {
             setReading(rd);
         }
     };
-    const { loading, wrapped: retreiveReading } = useAsyncLoading(_retreiveReading);
+
+    const { loading: loadingCourse, wrapped: retreiveCourse } = useAsyncLoading(_retreiveCourse);
+    const { loading: loadingReading, wrapped: retreiveReading } = useAsyncLoading(_retreiveReading);
+    const loading = loadingCourse || loadingReading || !course || !reading;
 
     useEffect(() => {
-        if(readingId) {
+        if(readingId && courseId) {
             if(ranOnLoad.current) return;
             ranOnLoad.current = true;
 
+            retreiveCourse(parseInt(courseId));
             retreiveReading(parseInt(readingId));
         }
     }, []);
 
-    return (
+    return loading ? PageLoading() : (
         <div className="flex flex-col gap-6">
             <div className="flex flex-row items-center gap-4">
                 <Button
-                    severity="secondary"
                     onClick={() => navigate(`/course/${courseId}`)}
+                    label={`Back to ${course.name}`}
                     icon="pi pi-chevron-left"
                     className="flex-shrink-0"
-                    rounded
                 />
-                <h1>{reading?.title || "Loading..."}</h1>
             </div>
-            {loading ? (
-                <div>
-                    <ProgressSpinner />
-                </div>
-            ) : (
-                <>
-                    <Splitter>
-                        <SplitterPanel minSize={25} className="p-6 flex flex-col gap-4">
-                            {reading?.content?.map((paragraph, index) => (
-                                <div key={index}>
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{paragraph}</ReactMarkdown>
-                                </div>
-                            ))}
-                        </SplitterPanel>
-                        {/* <SplitterPanel minSize={25}></SplitterPanel> */}
-                        {/* <SplitterPanel minSize={25}>
-                            <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
-                                <h1>Quiz</h1>
-                                {[
-                                    { question: "What is the main topic of the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
-                                    { question: "Which of the following is a key takeaway from the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
-                                    { question: "How does the reading relate to the overall course material?", options: ["Option A", "Option B", "Option C", "Option D"] },
-                                ].map((q, index) => (
-                                    <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem", justifyContent: "space-between" }} key={index}>
-                                        <h3 key={index}>{q.question}</h3>
-                                        {q.options.map((option, i) => (
-                                            <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                <RadioButton inputId={`option${i}`} name={`question${index}`} value={option} onChange={(e) => {}} checked={false} />
-                                                <label htmlFor={`option${i}`} >{option}</label>
-                                            </div>
-                                        ))}
-                                        <Button label="Check" onClick={() => {}} style={{ alignSelf: "center" }} />
+            <h1>{reading.title || "Loading..."}</h1>
+            <Splitter>
+                <SplitterPanel minSize={25} className="p-6 flex flex-col gap-4">
+                    {reading?.content?.map((paragraph, index) => (
+                        <div key={index}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{paragraph}</ReactMarkdown>
+                        </div>
+                    ))}
+                </SplitterPanel>
+                {/* <SplitterPanel minSize={25}></SplitterPanel> */}
+                {/* <SplitterPanel minSize={25}>
+                    <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
+                        <h1>Quiz</h1>
+                        {[
+                            { question: "What is the main topic of the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                            { question: "Which of the following is a key takeaway from the reading?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                            { question: "How does the reading relate to the overall course material?", options: ["Option A", "Option B", "Option C", "Option D"] },
+                        ].map((q, index) => (
+                            <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem", justifyContent: "space-between" }} key={index}>
+                                <h3 key={index}>{q.question}</h3>
+                                {q.options.map((option, i) => (
+                                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                        <RadioButton inputId={`option${i}`} name={`question${index}`} value={option} onChange={(e) => {}} checked={false} />
+                                        <label htmlFor={`option${i}`} >{option}</label>
                                     </div>
                                 ))}
+                                <Button label="Check" onClick={() => {}} style={{ alignSelf: "center" }} />
                             </div>
-                        </SplitterPanel> */}
-                    </Splitter>
-                    <div>
-                        <Button
-                            label="Mark as Read"
-                            severity="success"
-                            disabled={reading?.read}
-                            outlined={!reading?.read}
-                            onClick={markAsRead}
-                        />
+                        ))}
                     </div>
-                </>
-            )}
+                </SplitterPanel> */}
+            </Splitter>
+            <div>
+                <Button
+                    label="Mark as Read"
+                    severity="success"
+                    disabled={reading?.read}
+                    outlined={!reading?.read}
+                    onClick={markAsRead}
+                />
+            </div>
         </div>
     );
 }
