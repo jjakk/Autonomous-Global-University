@@ -70,7 +70,7 @@ function CoursePage() {
         };
     }, [course]);
     
-    return loadingContent ? PageLoading() : (
+    return /*loadingContent*/true ? PageLoading({ message: "Loading course content..." }) : (
         <div className="flex flex-col items-stretch gap-4">
             <div className="flex flex-col items-start gap-4">
                 <Button
