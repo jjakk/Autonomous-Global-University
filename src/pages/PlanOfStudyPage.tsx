@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { ProgressBar } from "primereact/progressbar";
 import { getCourseLabel, getGreeting } from "../utils";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +6,9 @@ import { aguDb, type Course, type User } from "../classes/AguDatabase";
 import ChatAgent from "../classes/ChatAgent";
 import { useAsyncLoading } from "../hooks";
 import { PageLoading } from "../components/PageLoading";
-import { Card } from "primereact/card";
 import { Knob } from "primereact/knob";
+import { TabPanel, TabView } from "primereact/tabview";
+import Section from "../components/Section";
 
 function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], startIndex: number, endIndex: number }) {
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
                         </h2>
                         <h4 className="m-4">{course.description}</h4>
                     </div>
-                    <div className="flex-1">
+                    {/* <div className="flex-1">
                         <div className="mb-2">
                             <ProgressBar
                                 // value={evalCourseProgress(course)}
@@ -32,7 +32,7 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
                             ></ProgressBar>
                         </div>
                         <span className="text-sm text-muted">Complete</span>
-                    </div>
+                    </div> */}
                 </div>
             ) : null)
         }
@@ -92,50 +92,51 @@ function PlanOfStudyPage() {
     }, []);
 
     return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
-        <div className="flex flex-row gap-10 items-start">
-            <div className="flex-1">
-                <h1 className="m-2">{getGreeting(user.firstName)}</h1>
-                <h2 className="m-4">Your Plan of Study</h2>
-                <Accordion>
-                    {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
-                        <AccordionTab key={year} header={year + " Year"}>
-                            <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
-                        </AccordionTab>
-                    ))}
-                </Accordion>
-            </div>
-            {/* <div className="flex flex-col flex-1 bg-white p-5 border-1 border-gray-300 rounded-lg">
-                <h1 className="m-2 text-center">Progress</h1>
-                <div className="flex flex-row">
-                    <div className="flex flex-col flex-1 items-center gap-5 mt-5">
-                        <h2 className="m-2 text-center">Overall</h2>
-                        <Knob
-                            value={10}
-                            size={150}
-                            readOnly
-                        />
-                    </div>
-                    <div className="flex-1-gray-100 p-5 border-round">
-                        <h2 className="m-2 text-center">Year by Year</h2>
-                        <h3 className="m-2">Freshman</h3>
-                        <ProgressBar
-                            value={20}
-                        ></ProgressBar>
-                        <h3 className="m-2">Sophomore</h3>
-                        <ProgressBar
-                            value={10}
-                        ></ProgressBar>
-                        <h3 className="m-2">Junior</h3>
-                        <ProgressBar
-                            value={5}
-                        ></ProgressBar>
-                        <h3 className="m-2">Senior</h3>
-                        <ProgressBar
-                            value={0}
-                        ></ProgressBar>
-                    </div>
+        <div className="flex flex-col items-start gap-10">
+            <h1 className="m-2">{getGreeting(user.firstName)}</h1>
+            <div className="flex flex-row gap-10 items-start">
+                <Section title="Plan of Study" className="flex-3">
+                    {/* <h1 className="m-2"></h1> */}
+                    <TabView>
+                        {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
+                            <TabPanel key={year} header={year + " Year"}>
+                                <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
+                            </TabPanel>
+                        ))}
+                    </TabView>
+                </Section>
+                <div className="flex flex-col flex-2 gap-10">
+                    <Section title="Progress" centerTitle>
+                        <div className="flex flex-col flex-1 items-center gap-5 mt-5">
+                            <Knob
+                                value={10}
+                                size={150}
+                                readOnly
+                            />
+                        </div>
+                        <div className="flex-1-gray-100 p-5 border-round">
+                            <h3 className="m-2">Freshman</h3>
+                            <ProgressBar
+                                value={20}
+                            ></ProgressBar>
+                            <h3 className="m-2">Sophomore</h3>
+                            <ProgressBar
+                                value={10}
+                            ></ProgressBar>
+                            <h3 className="m-2">Junior</h3>
+                            <ProgressBar
+                                value={5}
+                            ></ProgressBar>
+                            <h3 className="m-2">Senior</h3>
+                            <ProgressBar
+                                value={0}
+                            ></ProgressBar>
+                        </div>
+                    </Section>
+                    <Section title="Upcoming Assignments">
+                    </Section>
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 };
