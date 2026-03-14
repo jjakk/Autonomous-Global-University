@@ -12,6 +12,7 @@ import { useAsyncLoading } from "../hooks";
 function CoursePage() {
     let { courseId } = useParams();
     const navigate = useNavigate();
+    const ranOnLoad = useRef(false);
 
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
@@ -26,8 +27,10 @@ function CoursePage() {
         return await aguDb.units.toArray();
     };
 
-    const _retreiveCourse = async (courseId: number): Promise<void> => {
-        const retrievedCourse: Course | undefined = await aguDb.courses.get(courseId);
+    const _retreiveCourse = async (crsId: number): Promise<void> => {
+        const retrievedCourse: Course | undefined = !isNaN(crsId)
+            ? await aguDb.courses.get(crsId)
+            : undefined;
         if(!retrievedCourse) {
             alert("Course not found.");
             navigate("/plan-of-study");
@@ -36,8 +39,8 @@ function CoursePage() {
             setCourse(retrievedCourse);
         }
     };
-    const _retreiveUnits = async (course: Course, courseId: number): Promise<void> => {
-        let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(courseId).toArray();
+    const _retreiveUnits = async (course: Course, crsId: number): Promise<void> => {
+        let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(crsId).toArray();
 
         if(!retrievedUnits?.length) {
             console.warn("No units found for course. Creating units...");
@@ -52,8 +55,20 @@ function CoursePage() {
     const { loading: loadingUnits, wrapped: retreiveUnits } = useAsyncLoading(_retreiveUnits);
     const loadingContent = loadingCourse || loadingUnits;
 
-    useEffect(() => { courseId ? retreiveCourse(parseInt(courseId)) : null}, [courseId]);
-    useEffect(() => { course ? retreiveUnits(course, parseInt(course.id)) : null }, [course]);
+    useEffect(() => {
+        if(courseId) {
+            if(ranOnLoad.current) return;
+            ranOnLoad.current = true;
+
+            retreiveCourse(parseInt(courseId));
+        }
+    }, []);
+
+    useEffect(() => {
+        if(course) {
+            retreiveUnits(course, parseInt(course.id))
+        };
+    }, [course]);
     
     return (
         <div>

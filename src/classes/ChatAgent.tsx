@@ -48,6 +48,7 @@ export default class ChatAgent {
             const response = await testAI.models.generateContent({
                 model: ChatAgent.model,
                 contents: "Test",
+                config: { maxOutputTokens: 5 },
             });
             return !!response.text;
         }

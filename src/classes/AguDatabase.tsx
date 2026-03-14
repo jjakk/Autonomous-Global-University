@@ -37,9 +37,6 @@ export const coursesSchema: z.ZodType = z.array(z.object({
 }));
 export const coursesSchema_JSON = {
     type: "array",
-    // generationConfig: {
-    //     maxOutputTokens: 1,
-    // },
     items: {
         type: "object",
         properties: {
@@ -69,9 +66,6 @@ export const unitsSchema_JSON = {
     type: "array",
     minItems: 15,
     maxItems: 15,
-    generationConfig: {
-        maxOutputTokens: 50,
-    },
     items: {
         type: "object",
         properties: {
@@ -103,9 +97,6 @@ export const readingsSchema_JSON = {
     type: "array",
     minItems: 3,
     maxItems: 4,
-    generationConfig: {
-        maxOutputTokens: 50,
-    },
     items: {
         type: "object",
         properties: {
