@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
 import ChatAgent from "../classes/ChatAgent";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -12,6 +12,7 @@ import { useAsyncLoading } from "../hooks";
 function CoursePage() {
     let { courseId } = useParams();
     const navigate = useNavigate();
+
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
 

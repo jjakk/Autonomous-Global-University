@@ -1,7 +1,6 @@
 import Dexie from "dexie";
 import z from "zod";
 import AppAuth from "./AppAuth";
-import { de } from "zod/locales";
 
 export enum SupportedModels {
     GEMINI = "gemini",
@@ -38,6 +37,9 @@ export const coursesSchema: z.ZodType = z.array(z.object({
 }));
 export const coursesSchema_JSON = {
     type: "array",
+    // generationConfig: {
+    //     maxOutputTokens: 1,
+    // },
     items: {
         type: "object",
         properties: {
@@ -65,6 +67,11 @@ export const unitsSchema: z.ZodType = z.array(
 );
 export const unitsSchema_JSON = {
     type: "array",
+    minItems: 15,
+    maxItems: 15,
+    generationConfig: {
+        maxOutputTokens: 50,
+    },
     items: {
         type: "object",
         properties: {
@@ -94,6 +101,11 @@ export const readingsSchema: z.ZodType = z.array(
 );
 export const readingsSchema_JSON = {
     type: "array",
+    minItems: 3,
+    maxItems: 4,
+    generationConfig: {
+        maxOutputTokens: 50,
+    },
     items: {
         type: "object",
         properties: {
@@ -104,6 +116,43 @@ export const readingsSchema_JSON = {
         required: ["title", "description", "content"]
     }
 };
+
+// export const unitsWithReadingsSchema = z.array(
+//     z.object({
+//         name: z.string(),
+//         description: z.string(),
+//         readings: z.array(
+//             z.object({
+//                 title: z.string(),
+//                 description: z.string(),
+//                 content: z.array(z.string())
+//             })
+//         )
+//     })
+// );
+// export const unitsWithReadingsSchema_JSON = {
+//     type: "array",
+//     items: {
+//         type: "object",
+//         properties: {
+//             name: { type: "string" },
+//             description: { type: "string" },
+//             readings: {
+//                 type: "array",
+//                 items: {
+//                     type: "object",
+//                     properties: {
+//                         title: { type: "string" },
+//                         description: { type: "string" },
+//                         content: { type: "array", items: { type: "string", description: "Content written in Markdown format starting with a subheader" } },
+//                     },
+//                     required: ["title", "description", "content"]
+//                 }
+//             }
+//         },
+//         required: ["name", "description", "readings"]
+//     }
+// };
 
 export class AguDatabase extends Dexie {
     users!: Dexie.Table<User, number>;

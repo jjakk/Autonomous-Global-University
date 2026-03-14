@@ -14,8 +14,7 @@ export default class ChatAgent {
 
     private static onFailedRequest(error: any) {
         if(error?.status === 429) {
-            console.log("Rate limit hit. Marking in storage.");
-            // AppStorage.markRateLimitHit();
+            console.log("Rate limit hit");
         }
         else {
             console.error("Error in ChatAgent request: ", error);
@@ -29,7 +28,7 @@ export default class ChatAgent {
                 config: {
                     responseMimeType: "application/json",
                     responseJsonSchema: jsonSchema,
-                }
+                },
             });
     
             if(!response.text) {
@@ -68,7 +67,7 @@ export default class ChatAgent {
     async createUnits(course: Course): Promise<Partial<Unit>[]> {
         type UnitWithoutCourseId = Omit<Unit, "id" | "courseId">;
         const units: UnitWithoutCourseId[] = await this.createDataStructure<UnitWithoutCourseId>(
-            `Create 15 weekly units (each with a few readings) for the following course: "${course.name}", with the following description: "${course.description}`,
+            `Create weekly units for the following course: "${course.name}", with the following description: "${course.description}`,
             unitsSchema,
             unitsSchema_JSON
         );
@@ -77,21 +76,32 @@ export default class ChatAgent {
     }
     async createUnitReadings(unit: Unit): Promise<Reading[]> {
         const readings: Omit<Reading, 'unitId' | 'read'>[] = await this.createDataStructure<Omit<Reading, 'unitId' | 'read'>>(
-            `Create 5 readings for the following unit: "${unit.name}", with the following description: "${unit.description}`,
+            `Create readings for the following unit: "${unit.name}", with the following description: "${unit.description}`,
             readingsSchema,
             readingsSchema_JSON
         );
         const readingsWithUnitId: Reading[] = readings.map((r: Omit<Reading, 'unitId' | 'read'>) => ({ ...r, unitId: unit.id, read: false }));
         return readingsWithUnitId;
     }
-    async createReadingContent(reading: Reading): Promise<Reading> {
-        // const updatedReading: Reading = await this.createDataStructure<Reading>(
-        //     `Create me a reading for the following reading: "${reading.title}", with the following description: "${reading.description}". It should be about a 30 minute read and formatted as paragraphs of text.`,
-        //     readingSchema,
-        //     readingSchema_JSON
-        // );
-        // return updatedReading;
-        // TODO
-        return reading;
-    }
+    // async createUnitsWithReadings(course: Course): Promise<{ units: Partial<Unit>[], readings: Partial<Reading>[] }> {
+    //     type UnitWithReadings = Partial<Unit> & { readings?: Partial<Reading>[] };
+
+    //     const units: UnitWithReadings[] = await this.createDataStructure<UnitWithReadings>(
+    //         `Create 15 weekly units (each with a few readings) for the following course: "${course.name}", with the following description: "${course.description}`,
+    //         unitsWithReadingsSchema,
+    //         unitsWithReadingsSchema_JSON
+    //     );
+    //     const readings: Partial<Reading>[] = [];
+    //     console.log(units);
+    //     for(let i = 0; i < units.length; i++) {
+    //         const unit = units[i];
+    //         for(const reading of unit.readings || []) {
+    //             readings.push({ ...reading, read: false });
+    //         }
+    //         delete units[i].readings;
+    //     }
+    //     console.log(units, readings);
+
+    //     return { units, readings };
+    // }
 };

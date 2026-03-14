@@ -32,7 +32,6 @@ function GetStartedPage() {
     major: "",
     model: Object.values(SupportedModels)[0],
   });
-  console.log(newUser);
 
   const updateUser = (data: Partial<User>) => {
     setNewUser({ ...newUser, ...data });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { aguDb, type Reading, type Unit } from "../classes/AguDatabase";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatAgent from "../classes/ChatAgent";
@@ -12,6 +12,7 @@ interface UnitPreviewProps {
 
 export default function UnitPreview(props: UnitPreviewProps) {
     const navigate = useNavigate();
+    const ranOnLoad = useRef(false);
     const { courseId } = useParams();
     const [readings, setReadings] = useState<Reading[]>([]);
 
@@ -38,22 +39,28 @@ export default function UnitPreview(props: UnitPreviewProps) {
     };
     const { loading, wrapped: retreiveReadings } = useAsyncLoading(_retreiveReadings);
 
-    useEffect(() => { retreiveReadings(props.unit) }, []);
+    useEffect(() => {
+        if (ranOnLoad.current) return;
+        ranOnLoad.current = true;
+        
+        retreiveReadings(props.unit);
+    }, []);
 
     return (
         <>
             {loading ? (
-                <ProgressSpinner />
+                <div className="flex flex-row items-center gap-4 m-4">
+                    <ProgressSpinner />
+                </div>
             ) : readings.map((reading, rIndex) => (
-                <div key={rIndex}>
-                    <h4>Reading {rIndex + 1} - {reading.title}</h4>
+                <div key={rIndex} className="flex flex-col items-start gap-2 m-4">
+                    <h3>Reading {rIndex + 1} - {reading.title}</h3>
                     <h5>{reading.description}</h5>
                     <Button
                         label={"View Reading " + (reading.read ? "(Complete)" : "(Incomplete)")}
                         onClick={() => navigate(`/course/${courseId}/unit/${props.unit.id}/reading/${rIndex}`)}
                         severity="success"
-                        // outlined={!reading.read}
-                        // disabled={rIndex > 0 && array[rIndex - 1].read === false}
+                        outlined={!reading.read}
                     />
                 </div>
             ))}

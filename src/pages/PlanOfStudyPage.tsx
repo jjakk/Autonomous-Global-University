@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { ProgressBar } from "primereact/progressbar";
 import { getCourseLabel } from "../utils";
@@ -15,7 +15,7 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
         <div>
         {
             courses.map((course, index) => (index >= startIndex && index < endIndex) ? (
-                <div key={course.id} className="flex justify-content-between align-items-center gap-5 mb-3" >
+                <div key={course.name} className="flex justify-content-between align-items-center gap-5 mb-3" >
                     <div className="flex-1">
                         <h2>
                             <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course, index)}</a>
@@ -39,6 +39,8 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
 }
 
 function PlanOfStudyPage() {
+    const ranOnLoad = useRef(false);
+
     const [courses, setCourses] = useState<Course[]>([]);
 
     const createPlanOfStudy = async (): Promise<Course[]> => {
@@ -65,7 +67,12 @@ function PlanOfStudyPage() {
     }
     const { loading, wrapped: retreiveCourses } = useAsyncLoading(_retreiveCourses);
     
-    useEffect(() => { retreiveCourses(); }, []);
+    useEffect(() => {
+        if(ranOnLoad.current) return;
+        ranOnLoad.current = true;
+        
+        retreiveCourses();
+    }, []);
 
     return (
         <div className="home-page">
@@ -80,7 +87,7 @@ function PlanOfStudyPage() {
                     <h2 className="m-4">Your Plan of Study:</h2>
                     <Accordion>
                         {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
-                            <AccordionTab key={i} header={year + " Year"}>
+                            <AccordionTab key={year} header={year + " Year"}>
                                 <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
                             </AccordionTab>
                         ))}
