@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
@@ -7,96 +7,74 @@ import { getCourseLabel } from "../utils";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { Reading, Unit } from "../classes/AguDatabase";
-
+import { aguDb, type Reading, type Unit } from "../classes/AguDatabase";
+import { useAsyncLoading } from "../hooks";
 
 function ReadingPage() {
-    let { courseIndex, unitIndex, readingIndex } = useParams();
-    const course = null;//AppStorage.getCourses()?.[parseInt(courseIndex || "-1")];
+    let { courseId, readingId } = useParams();
     const navigate = useNavigate();
+    const ranOnLoad = useRef(false);
+
     const [reading, setReading] = useState<Reading | null>(null);
-    const [loadingContent, setLoadingContent] = useState<boolean>(false);
 
-    const retreiveReadingContent = async (reading: Reading): Promise<Reading> => {
-        const chatAgent = new ChatAgent(/*AppStorage.getUser()?.apiKey || */"");
-        const updatedReading = await chatAgent.createReadingContent(reading);
-        return updatedReading;
-    };
-
-    const markAsRead = () => {
+    const markAsRead = async () => {
         if(reading) {
-            const updatedReading = { ...reading, read: true };
-            setReading(updatedReading);
-            // AppStorage.markReadingAsRead(
-            //     parseInt(courseIndex || "-1"),
-            //     parseInt(unitIndex || "-1"),
-            //     parseInt(readingIndex || "-1")
-            // );
+            await aguDb.readings.update(reading.id, { read: true });
+            setReading({ ...reading, read: true });
         }
     };
 
-    useEffect(() => {
-        const units: Unit[] = [];//AppStorage.getCourseUnits(parseInt(courseIndex || "-1"));
-        if(units.length > 0) {
-            const foundUnit = units[parseInt(unitIndex || "-1")];
-            if(foundUnit) {
-                // const foundReading = foundUnit.readings[parseInt(readingIndex || "-1")];
-                // if(foundReading) {
-                //     setReading(foundReading);
-                // }
-            }
+    const _retreiveReading = async (rId: number) => {
+        const rd: Reading | undefined = !isNaN(rId)
+            ? await aguDb.readings.get(rId)
+            : undefined;
+
+        if(!rd) {
+            alert("Reading not found.");
+            navigate(`/course/${courseId}`);
         }
-    }, [courseIndex, unitIndex, readingIndex]);
+        else {
+            setReading(rd);
+        }
+    };
+    const { loading, wrapped: retreiveReading } = useAsyncLoading(_retreiveReading);
 
     useEffect(() => {
-        (async function() {
-            if(reading) {
-                if(!reading.content) {
-                    setLoadingContent(true);
-                    const newReading: Reading = await retreiveReadingContent(reading);
-                    setReading(newReading);
-                    // Update the reading content in storage
-                    // AppStorage.addReadingContent(
-                    //     parseInt(courseIndex || "-1"),
-                    //     parseInt(unitIndex || "-1"),
-                    //     parseInt(readingIndex || "-1"),
-                    //     newReading.content || []
-                    // );
-                    setLoadingContent(false);
+        if(readingId) {
+            if(ranOnLoad.current) return;
+            ranOnLoad.current = true;
 
-                }
-            }
-        })();
-    }, [reading]);
+            retreiveReading(parseInt(readingId));
+        }
+    }, []);
 
     return (
-        <div className="reading-page">
-            <Button
-                label={(
-                    course
-                        ? getCourseLabel(course, parseInt(courseIndex || "-1"))
-                        : "Course Page"
-                )}
-                severity="secondary"
-                onClick={() => navigate(`/course/${courseIndex}`)}
-                icon="pi pi-chevron-left"
-            />
-            <h1>{reading?.title}</h1>
-            {loadingContent ? (
-                <div className="loading-content">
+        <div className="flex flex-col gap-6">
+            <div className="flex flex-row items-center gap-4">
+                <Button
+                    severity="secondary"
+                    onClick={() => navigate(`/course/${courseId}`)}
+                    icon="pi pi-chevron-left"
+                    className="flex-shrink-0"
+                    rounded
+                />
+                <h1>{reading?.title || "Loading..."}</h1>
+            </div>
+            {loading ? (
+                <div>
                     <ProgressSpinner />
                 </div>
             ) : (
                 <>
-                    <Splitter className="reading-content">
-                        <SplitterPanel className="reading-content-text" minSize={25}>
-                            <h1>Reading</h1>
+                    <Splitter>
+                        <SplitterPanel minSize={25} className="p-6 flex flex-col gap-4">
                             {reading?.content?.map((paragraph, index) => (
                                 <div key={index}>
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{paragraph}</ReactMarkdown>
                                 </div>
                             ))}
                         </SplitterPanel>
+                        {/* <SplitterPanel minSize={25}></SplitterPanel> */}
                         {/* <SplitterPanel minSize={25}>
                             <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
                                 <h1>Quiz</h1>
@@ -110,7 +88,7 @@ function ReadingPage() {
                                         {q.options.map((option, i) => (
                                             <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                                                 <RadioButton inputId={`option${i}`} name={`question${index}`} value={option} onChange={(e) => {}} checked={false} />
-                                                <label htmlFor={`option${i}`} className="ml-2">{option}</label>
+                                                <label htmlFor={`option${i}`} >{option}</label>
                                             </div>
                                         ))}
                                         <Button label="Check" onClick={() => {}} style={{ alignSelf: "center" }} />
@@ -119,7 +97,7 @@ function ReadingPage() {
                             </div>
                         </SplitterPanel> */}
                     </Splitter>
-                    <div className="end-of-reading-actions">
+                    <div>
                         <Button
                             label="Mark as Read"
                             severity="success"

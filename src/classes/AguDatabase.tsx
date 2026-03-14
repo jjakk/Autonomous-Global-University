@@ -79,7 +79,7 @@ export const unitsSchema_JSON = {
 // READING types & schemas
 const READING_DB_SCHEMA = "++id,unitId,title,description,read,content";
 export interface Reading {
-    id: string;
+    id: number;
     unitId: string;
     title: string;
     description: string;
@@ -95,8 +95,8 @@ export const readingsSchema: z.ZodType = z.array(
 );
 export const readingsSchema_JSON = {
     type: "array",
-    minItems: 3,
-    maxItems: 4,
+    // minItems: 3,
+    // maxItems: 4,
     items: {
         type: "object",
         properties: {

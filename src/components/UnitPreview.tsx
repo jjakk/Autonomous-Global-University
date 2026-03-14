@@ -53,12 +53,12 @@ export default function UnitPreview(props: UnitPreviewProps) {
                     <ProgressSpinner />
                 </div>
             ) : readings.map((reading, rIndex) => (
-                <div key={rIndex} className="flex flex-col items-start gap-2 m-4">
+                <div key={reading.title} className="flex flex-col items-start gap-2 m-4">
                     <h3>Reading {rIndex + 1} - {reading.title}</h3>
                     <h5>{reading.description}</h5>
                     <Button
                         label={"View Reading " + (reading.read ? "(Complete)" : "(Incomplete)")}
-                        onClick={() => navigate(`/course/${courseId}/unit/${props.unit.id}/reading/${rIndex}`)}
+                        onClick={() => navigate(`/course/${courseId}/reading/${reading.id}`)}
                         severity="success"
                         outlined={!reading.read}
                     />
