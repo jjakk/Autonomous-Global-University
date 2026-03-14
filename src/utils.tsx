@@ -9,6 +9,19 @@ export const getCourseLabel = (course: Course, index: number): string => {
     return `Course ${courseCode}: ${course.name}`;
 }
 
+export const getGreeting = (name: string) => {
+    const now = new Date();
+    const hour = now.getHours(); // Gets the hour in 24-hour format (0-23)
+
+    const greeting = (hour >= 5 && hour < 12)
+        ? "morning"
+        : (hour >= 12 && hour < 18)
+            ? "afternoon"
+            : "evening";
+            
+    return `Good ${greeting}, ${name}!`;
+}
+
 // export const evalPlanOfStudyProgress = (courses: Course[] | null): number => {
 //     if(!courses || courses.length === 0) return 0;
 //     const courseProgresses = [];

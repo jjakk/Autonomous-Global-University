@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { ProgressBar } from "primereact/progressbar";
-import { getCourseLabel } from "../utils";
+import { getCourseLabel, getGreeting } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { aguDb, type Course, type User } from "../classes/AguDatabase";
 import ChatAgent from "../classes/ChatAgent";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { useAsyncLoading } from "../hooks";
+import { PageLoading } from "../components/PageLoading";
 
 function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], startIndex: number, endIndex: number }) {
     const navigate = useNavigate();
@@ -39,9 +39,11 @@ function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], s
 }
 
 function PlanOfStudyPage() {
+    const navigate = useNavigate();
     const ranOnLoad = useRef(false);
 
     const [courses, setCourses] = useState<Course[]>([]);
+    const [user, setUser] = useState<User | null>(null);
 
     const createPlanOfStudy = async (): Promise<Course[]> => {
         // Create the plan of study using the ChatAgent
@@ -54,6 +56,15 @@ function PlanOfStudyPage() {
         return courses;
     };
 
+    const _retreiveUser = async (): Promise<void> => {
+        const user = await aguDb.getUser();
+        if(!user) {
+            alert("No user found in database. Please set up your profile to generate a personalized plan of study.");
+            navigate("/get-started");
+        } else {
+            setUser(user);
+        }
+    };
     const _retreiveCourses = async (): Promise<void> => {
         let coursesInDb: Course[] = await aguDb.courses.toArray();
 
@@ -65,35 +76,30 @@ function PlanOfStudyPage() {
 
         setCourses(coursesInDb);
     }
-    const { loading, wrapped: retreiveCourses } = useAsyncLoading(_retreiveCourses);
+
+    const { loading: loadingUser, wrapped: retreiveUser } = useAsyncLoading(_retreiveUser);
+    const { loading: loadingCourses, wrapped: retreiveCourses } = useAsyncLoading(_retreiveCourses);
+    const loading = loadingUser || loadingCourses || !user;
     
     useEffect(() => {
         if(ranOnLoad.current) return;
         ranOnLoad.current = true;
         
+        retreiveUser();
         retreiveCourses();
     }, []);
 
-    return (
-        <div className="home-page">
-            {loading ? (
-                <div className="flex flex-col items-center gap-4">
-                    <h2 className="m-2">Creating your personalized plan of study...</h2>
-                    <ProgressSpinner />
-                </div>
-            ) : (
-                <div>
-                    <h1 className="m-2">Welcome to Autonomous Global University!</h1>
-                    <h2 className="m-4">Your Plan of Study:</h2>
-                    <Accordion>
-                        {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
-                            <AccordionTab key={year} header={year + " Year"}>
-                                <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
-                            </AccordionTab>
-                        ))}
-                    </Accordion>
-                </div>
-            )}
+    return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
+        <div>
+            <h1 className="m-2">{getGreeting(user.firstName)}</h1>
+            <h2 className="m-4">Your Plan of Study:</h2>
+            <Accordion>
+                {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
+                    <AccordionTab key={year} header={year + " Year"}>
+                        <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
+                    </AccordionTab>
+                ))}
+            </Accordion>
         </div>
     );
 };
