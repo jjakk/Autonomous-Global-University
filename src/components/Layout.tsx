@@ -4,8 +4,6 @@ import { NavLink, Outlet, useParams } from "react-router-dom";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
-import { ScrollPanel } from "primereact/scrollpanel";
-import { InputTextarea } from "primereact/inputtextarea";
 import AppAuth from "../classes/AppAuth";
 import { aguDb, type Course } from "../classes/AguDatabase";
 import { useAsyncLoading } from "../hooks";
@@ -18,15 +16,23 @@ function AppHeader() {
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
 
-    const _updateCourseSelection = async (courseId: string) => {
+    const _getAvailableCourses = async () => {
         const ac: Course[] = await aguDb.courses.toArray();
         setAvailableCourses(ac);
-        if(courseId && ac.length > 0) {
-            const courseFound: Course | null = ac.find(c => c.id == parseInt(courseId)) || null;
+    };
+    const _updateCourseSelection = async (courseId: string) => {
+        if(courseId && availableCourses.length > 0) {
+            const courseFound: Course | null = availableCourses.find(c => c.id == parseInt(courseId)) || null;
             setSelectedCourse(courseFound);
         }
     };
-    const { loading, wrapped: updateCourseSelection } = useAsyncLoading(_updateCourseSelection);
+    const { loading: loadingAvailableCourses, wrapped: getAvailableCourses } = useAsyncLoading(_getAvailableCourses);
+    const { loading: loadingUpdateCourseSelection, wrapped: updateCourseSelection } = useAsyncLoading(_updateCourseSelection);
+    const loading = loadingAvailableCourses || loadingUpdateCourseSelection;
+
+    useEffect(() => {
+        getAvailableCourses();
+    }, []);
 
     useEffect(() => {
         if(courseId) {
@@ -49,7 +55,7 @@ function AppHeader() {
                     <h3>Education for All</h3>
                 </div>
             </div>
-            {AppAuth.isAuthenticated() ? (
+            {AppAuth.isAuthenticated() && !loading ? (
                 <div className="nav-header-right">
                     <Button type="button" icon="pi pi-info-circle" label="Teaching Assistant" onClick={(e) => op.current?.toggle(e)} />
                     <OverlayPanel ref={op} dismissable={false} className="ta-interaction-box">
@@ -58,8 +64,8 @@ function AppHeader() {
                             onChange={(e) => setSelectedCourse(e.value)}
                             options={availableCourses}
                             optionLabel="name"
-                            itemTemplate={(option) => (<>{getCourseLabel(option)}</>)}
-                            valueTemplate={(option) => (<>{getCourseLabel(option)}</>)}
+                            itemTemplate={(option) => <>{getCourseLabel(option)}</>}
+                            valueTemplate={(option) => option ? (<>{getCourseLabel(option)}</>) : "Select a Course"}
                             placeholder={loading ? "Loading..." : "Select a Course"}
                             className="w-full md:w-14rem"
                             disabled={loading}

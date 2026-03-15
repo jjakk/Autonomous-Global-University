@@ -1,6 +1,5 @@
 import "./TaChat.scss";
 import { Button } from "primereact/button";
-import { ScrollPanel } from "primereact/scrollpanel";
 import { aguDb, type Course } from "../classes/AguDatabase";
 import { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
@@ -11,11 +10,13 @@ interface TaChatProps {
     selectedCourse: Course;
 }
 
+const getStartingMessage = (courseName: string) => `Hey, I'll be your TA for ${courseName}, let me know if you have any questions!`;
+
 export default function TaChat(props: TaChatProps) {
     const scrollPanelRef = useRef(null);
     
     const [chatHistory, setChatHistory] = useState<{ sender: "ta" | "student"; message: string }[]>([
-        { sender: "ta", message: `Hey, I'll be your TA for ${props.selectedCourse.name}, let me know if you have any questions!` },
+        { sender: "ta", message: getStartingMessage(props.selectedCourse.name) },
     ]);
     const [currentInput, setCurrentInput] = useState("");
 
@@ -41,6 +42,10 @@ export default function TaChat(props: TaChatProps) {
             scrollPanelRef.current.scrollTop = scrollPanelRef.current.scrollHeight + 100;
         }
     }, [chatHistory]);
+
+    useEffect(() => {
+        setChatHistory([{ sender: "ta", message: getStartingMessage(props.selectedCourse.name) }]);
+    }, [props.selectedCourse]);
 
     return (
         <div className="chat-wrapper mt-4">
