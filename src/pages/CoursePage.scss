@@ -11,12 +11,6 @@
         background-color: var(--green-600);
         color: white;
     }
-    &:active{
-        line-height: 2rem;
-        border: none;
-        background-color: var(--primary-600);
-        color: white;
-    }
 }
 
 .p-highlight .unit-number {
@@ -24,4 +18,8 @@
     border: none;
     background-color: var(--primary-600);
     color: white;
+
+    &.complete {
+        background-color: var(--green-600);
+    }
 }

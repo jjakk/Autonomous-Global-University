@@ -149,8 +149,8 @@ function PlanOfStudyPage() {
                             ))}
                         </div>
                     </Section>
-                    <Section title="Upcoming Assignments">
-                    </Section>
+                    {/* <Section title="Upcoming Assignments">
+                    </Section> */}
                 </div>
             </div>
         </div>
