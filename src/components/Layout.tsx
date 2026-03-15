@@ -10,6 +10,7 @@ import AppAuth from "../classes/AppAuth";
 import { aguDb, type Course } from "../classes/AguDatabase";
 import { useAsyncLoading } from "../hooks";
 import { getCourseLabel } from "../utils";
+import TaChat from "./TaChat";
 
 function AppHeader() {
     let { courseId } = useParams();
@@ -63,23 +64,7 @@ function AppHeader() {
                             className="w-full md:w-14rem"
                             disabled={loading}
                         />
-                        {selectedCourse && (
-                            <div>
-                                <ScrollPanel style={{ width: '100%', height: '200px' }}>
-                                    <div className="ta-chat-history">
-                                        <p className="chat-bubble ta-response">Hey, I'll be your TA for {selectedCourse.name}, let me know if you have any questions!</p>
-                                        {/* <p className="chat-bubble student-response">Example user response</p> */}
-                                    </div>
-                                </ScrollPanel>
-                                <form className="ta-input-form" onSubmit={(e) => {
-                                    e.preventDefault();
-                                    // Handle question submission to TA here
-                                }}>
-                                    <InputTextarea placeholder="Ask a question" style={{ width: '100%' }} />
-                                    <Button icon="pi pi-send" disabled />
-                                </form>
-                            </div>
-                        )}
+                        {selectedCourse && <TaChat selectedCourse={selectedCourse} />}
                     </OverlayPanel>
                 </div>
             ) : (

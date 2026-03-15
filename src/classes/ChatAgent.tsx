@@ -70,6 +70,34 @@ export default class ChatAgent {
             return false;
         }
     }
+    async askTaQuestion(course: Course, question: string): Promise<string> {
+        try {
+            if (this.currentController) {
+                this.currentController.abort();
+            }
+            this.currentController = new AbortController();
+            const response = await this.ai.models.generateContent({
+                model: ChatAgent.model,
+                contents: `You are a helpful teaching assistant for the following course: "${course.name}", with the following description: "${course.description}". Answer the following question from a student as helpfully as possible: "${question}"`,
+                config: {
+                    // maxOutputTokens: 500,
+                    abortSignal: this.currentController.signal
+                },
+            });
+    
+            if(!response.text) {
+                throw new Error("No response from AI");
+            }
+            return response.text;
+        }
+        catch (error) {
+            ChatAgent.onFailedRequest(error);
+            throw new Error("Failed to get TA response. See console for details.");
+        }
+        finally {
+            this.currentController = null;
+        }
+    }
     async createPlanOfStudy(major: string, years: Year[]): Promise<Course[]> {
             const courses: Course[] = await this.createDataStructure<Course>(
                 `Create a 4 year curriculum for a university student majoring in ${major}. Include core courses, electives, and a brief description of each course. Order the courses starting with the easiest first, and the more rigorous courses later.`,
