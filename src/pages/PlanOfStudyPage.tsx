@@ -10,61 +10,36 @@ import { Knob } from "primereact/knob";
 import { TabPanel, TabView } from "primereact/tabview";
 import Section from "../components/Section";
 
-function CoursesRender({ courses, startIndex, endIndex }: { courses: Course[], startIndex: number, endIndex: number }) {
-    const navigate = useNavigate();
-
-    return (
-        <div>
-        {
-            courses.map((course, index) => (index >= startIndex && index < endIndex) ? (
-                <div key={course.name} className="flex justify-content-between align-items-center gap-5 mb-3" >
-                    <div className="flex-1">
-                        <h2>
-                            <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course)}</a>
-                        </h2>
-                        <h4 className="m-4">{course.description}</h4>
-                    </div>
-                    {/* <div className="flex-1">
-                        <div className="mb-2">
-                            <ProgressBar
-                                // value={evalCourseProgress(course)}
-                                value={0}
-                            ></ProgressBar>
-                        </div>
-                        <span className="text-sm text-muted">Complete</span>
-                    </div> */}
-                </div>
-            ) : null)
-        }
-        </div>
-    );
-}
-
 function PlanOfStudyPage() {
     const navigate = useNavigate();
     const ranOnLoad = useRef(false);
 
     const [user, setUser] = useState<User | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
+    const [academicYears, setAcademicYears] = useState<Year[]>([]);
     const [planOfStudyProgress, setPlanOfStudyProgress] = useState<number>(0);
 
-    const createPlanOfStudy = async (): Promise<Course[]> => {
-        // Create the plan of study using the ChatAgent
-        const user: User = await aguDb.getUser();
-        const agent = new ChatAgent(user.apiKey);
-        
-        // Initialize 4 years to group courses into
-        const yrs: Partial<Year>[] = [
+    const createAcademicYears = async (): Promise<Year[]> => {
+        const yearsToBulkAdd: Omit<Year, "id">[] = [
             { name: "Freshman Year", index: 1 },
             { name: "Sophomore Year", index: 2 },
             { name: "Junior Year", index: 3 },
             { name: "Senior Year", index: 4 },
         ];
-        await aguDb.years.bulkAdd(yrs as Year[]);
-        const years: Year[] = await aguDb.years.toArray();
+        await aguDb.years.bulkAdd(yearsToBulkAdd as Year[]);
+        const yearsInDb = await aguDb.years.toArray();
 
-        const courses: Course[] = await agent.createPlanOfStudy(user.major, years);
-        await aguDb.courses.bulkAdd(courses);
+        return yearsInDb;
+    };
+
+    const createPlanOfStudy = async (years: Year[]): Promise<Course[]> => {
+        // Create the plan of study using the ChatAgent
+        const user: User = await aguDb.getUser();
+        const agent = new ChatAgent(user.apiKey);
+
+        const coursesToBulkAdd: Partial<Course>[] = await agent.createPlanOfStudy(user.major, years);
+        await aguDb.courses.bulkAdd(coursesToBulkAdd as Course[]);
+        const courses: Course[] = await aguDb.courses.toArray();
 
         return courses;
     };
@@ -80,13 +55,21 @@ function PlanOfStudyPage() {
     };
     const _retreiveCourses = async (): Promise<void> => {
         let coursesInDb: Course[] = await aguDb.courses.toArray();
+        let yearsInDb: Year[] = await aguDb.years.toArray();
+
+        if(!yearsInDb.length) {
+            console.warn("No academic years found in database, creating default academic years...");
+            yearsInDb = await createAcademicYears();
+            console.log("Academic years created and loaded to database: ", yearsInDb);
+        }
         
         if(!coursesInDb.length) {
             console.warn("No courses found in database, creating plan of study...");
-            coursesInDb = await createPlanOfStudy();
+            coursesInDb = await createPlanOfStudy(yearsInDb);
             console.log("Plan of study created and loaded to database: ", coursesInDb);
         }
         
+        setAcademicYears(yearsInDb);
         setCourses(coursesInDb);
     }
     const _retreivePlanOfStudyProgress = async (): Promise<void> => {
@@ -114,9 +97,18 @@ function PlanOfStudyPage() {
             <div className="flex flex-row gap-10 items-start">
                 <Section title="Plan of Study" className="flex-3">
                     <TabView>
-                        {["Freshman", "Sophomore", "Junior", "Senior"].map((year, i) => (
-                            <TabPanel key={year} header={year + " Year"}>
-                                <CoursesRender courses={courses} startIndex={(i * courses.length) / 4} endIndex={((i + 1) * courses.length) / 4} />
+                        {academicYears.map((year: Year) => (
+                            <TabPanel key={year.name} header={year.name}>
+                                {courses.filter((course) => course.yearId === year.id).map((course) => (
+                                    <div key={course.name} className="flex justify-content-between align-items-center gap-5 mb-3" >
+                                        <div className="flex-1">
+                                            <h2>
+                                                <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course)}</a>
+                                            </h2>
+                                            <h4 className="m-4">{course.description}</h4>
+                                        </div>
+                                    </div>
+                                ))}
                             </TabPanel>
                         ))}
                     </TabView>

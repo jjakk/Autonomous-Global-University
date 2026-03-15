@@ -14,7 +14,7 @@ export interface User {
     model: SupportedModels;
 };
 
-const YEAR_DB_SCHEMA = "++id,name,index";
+const YEAR_DB_SCHEMA = "++id,name,&index";
 export interface Year {
     id: number;
     name: string;
@@ -39,8 +39,6 @@ export const coursesSchema: z.ZodType = z.array(z.object({
 }));
 export const coursesSchema_JSON = {
     type: "array",
-    minItems: 3,
-    maxItems: 5,
     uniqueItems: true,
     // Requires validator support (e.g., ajv-keywords) to enforce uniqueness by a specific property.
     uniqueItemProperties: ["code"],
@@ -108,8 +106,8 @@ export const readingsSchema: z.ZodType = z.array(
 );
 export const readingsSchema_JSON = {
     type: "array",
-    // minItems: 3,
-    // maxItems: 4,
+    minItems: 3,
+    maxItems: 4,
     items: {
         type: "object",
         properties: {
