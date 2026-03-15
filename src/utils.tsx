@@ -5,9 +5,7 @@ export const calculateCourseCode = (index: number): number => {
 }
 
 export const getCourseLabel = (course: Course): string => {
-    const index = parseInt(course.id);
-    const courseCode = calculateCourseCode(index);
-    return `Course ${courseCode}: ${course.name}`;
+    return `Course ${course.code}: ${course.name}`;
 }
 
 export const getGreeting = (name: string) => {

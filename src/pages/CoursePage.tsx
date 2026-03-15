@@ -1,5 +1,5 @@
 import "./CoursePage.scss";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import ChatAgent from "../classes/ChatAgent";
 import { Button } from "primereact/button";
@@ -16,11 +16,18 @@ import { getCourseLabel } from "../utils";
 
 function CoursePage() {
     let { courseId } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const ranOnLoad = useRef(false);
 
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
+    
+    const activeStep = units.findIndex(u => u.id === parseInt(searchParams.get("unit") ?? ""));
+      const handleStepChange = (e: any) => {
+        const selectedUnit = units[e.index];
+        setSearchParams({ unit: selectedUnit.id.toString() });
+    };
 
     const createNewUnits = async (course: Course): Promise<Unit[]> => {
         const apiKey = await aguDb.getUserApiKey();
@@ -44,8 +51,8 @@ function CoursePage() {
             setCourse(retrievedCourse);
         }
     };
-    const _retreiveUnits = async (course: Course, crsId: number): Promise<void> => {
-        let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(crsId).toArray();
+    const _retreiveUnits = async (course: Course): Promise<void> => {
+        let retrievedUnits: Unit[] = await aguDb.units.where("courseId").equals(course.id).toArray();
 
         if(!retrievedUnits?.length) {
             console.warn("No units found for course. Creating units...");
@@ -71,7 +78,7 @@ function CoursePage() {
 
     useEffect(() => {
         if(course) {
-            retreiveUnits(course, parseInt(course.id))
+            retreiveUnits(course);
         };
     }, [course]);
     
@@ -88,7 +95,7 @@ function CoursePage() {
             </div>
             <Section title={getCourseLabel(course)} subtitle={course?.description}>
                 <h2 className="m-4">Curriculum</h2>
-                <Stepper orientation="vertical">
+                <Stepper orientation="vertical" activeStep={activeStep} onChangeStep={handleStepChange}>
                     {units.map((unit) => (
                         <StepperPanel
                             key={unit.name}

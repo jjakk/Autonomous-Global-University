@@ -4,17 +4,22 @@ import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON,
 export default class ChatAgent {
     private static model = "gemini-2.5-flash";
     private ai: GoogleGenAI;
+    private currentController: AbortController | null;
 
     constructor(apiKey: string) {
         if(!apiKey) {
             throw new Error("API key is required to initialize ChatAgent");
         }
         this.ai = new GoogleGenAI({ apiKey });
+        this.currentController = null;
     }
 
     private static onFailedRequest(error: any) {
         if(error?.status === 429) {
-            console.log("Rate limit hit");
+            console.error("Rate limit hit");
+        }
+        else if(error.name === "AbortError") {
+            console.warn("Previous request aborted due to new request");
         }
         else {
             console.error("Error in ChatAgent request: ", error);
@@ -22,12 +27,17 @@ export default class ChatAgent {
     }
     private async createDataStructure<T>(prompt: string, zodSchema: any, jsonSchema: any): Promise<T[]> {
         try {
+            if (this.currentController) {
+                this.currentController.abort();
+            }
+            this.currentController = new AbortController();
             const response = await this.ai.models.generateContent({
                 model: ChatAgent.model,
                 contents: prompt,
                 config: {
                     responseMimeType: "application/json",
                     responseJsonSchema: jsonSchema,
+                    abortSignal: this.currentController.signal
                 },
             });
     
@@ -39,6 +49,9 @@ export default class ChatAgent {
         catch (error) {
             ChatAgent.onFailedRequest(error);
             throw new Error("Failed to create courses. See console for details.");
+        }
+        finally {
+            this.currentController = null;
         }
     }
 

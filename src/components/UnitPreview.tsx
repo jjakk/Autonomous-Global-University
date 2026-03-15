@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import ChatAgent from "../classes/ChatAgent";
 import { useAsyncLoading } from "../hooks";
 import { Button } from "primereact/button";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { PageLoading } from "./PageLoading";
 
 interface UnitPreviewProps {
@@ -41,9 +40,9 @@ export default function UnitPreview(props: UnitPreviewProps) {
     const { loading, wrapped: retreiveReadings } = useAsyncLoading(_retreiveReadings);
 
     useEffect(() => {
-        if (ranOnLoad.current) return;
+        if(ranOnLoad.current) return;
         ranOnLoad.current = true;
-        
+
         retreiveReadings(props.unit);
     }, []);
 

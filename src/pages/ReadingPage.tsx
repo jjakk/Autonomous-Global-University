@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
-import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { aguDb, type Course, type Reading } from "../classes/AguDatabase";
@@ -66,7 +65,7 @@ function ReadingPage() {
         <div className="flex flex-col gap-6">
             <div className="flex flex-row items-center gap-4">
                 <Button
-                    onClick={() => navigate(`/course/${courseId}`)}
+                    onClick={() => navigate(`/course/${courseId}?unit=${reading?.unitId}`)}
                     label={`Back to ${course.name}`}
                     icon="pi pi-chevron-left"
                     className="flex-shrink-0"

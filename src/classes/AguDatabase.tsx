@@ -16,7 +16,7 @@ export interface User {
 
 const YEAR_DB_SCHEMA = "++id,name,&index";
 export interface Year {
-    id: string;
+    id: number;
     name: string;
     index: number;
 }
@@ -24,35 +24,48 @@ export interface Year {
 // COURSE types & schemas
 const COURSE_DB_SCHEMA = "++id,yearId,name,description,type";
 export interface Course {
-    id: string;
+    id: number;
     yearId: string;
     name: string;
     description: string;
     type: "core" | "elective";
+    code: number;
 };
 export const coursesSchema: z.ZodType = z.array(z.object({
     name: z.string(),
     description: z.string(),
     type: z.enum(["core", "elective"]),
+    code: z.number().int().positive(),
 }));
 export const coursesSchema_JSON = {
     type: "array",
+    minItems: 3,
+    maxItems: 5,
+    uniqueItems: true,
+    // Requires validator support (e.g., ajv-keywords) to enforce uniqueness by a specific property.
+    uniqueItemProperties: ["code"],
     items: {
         type: "object",
         properties: {
             name: { type: "string" },
             description: { type: "string" },
-            type: { type: "string", "enum": ["core", "elective"] }
+            type: { type: "string", enum: ["core", "elective"] },
+            code: {
+                type: "number",
+                minimum: 100,
+                maximum: 499,
+                description: "A course code indicating its difficulty level (e.g., 100-199 for freshman courses, 200-299 for sophomore courses, etc.)",
+            },
         },
-        required: ["name", "description", "type"]
-    }
+        required: ["name", "description", "type", "code"],
+    },
 };
 
 // UNIT types & schemas
 const UNIT_DB_SCHEMA = "++id,courseId,name";
 export interface Unit {
-    id: string;
-    courseId: string;
+    id: number;
+    courseId: number;
     name: string;
     description: string;
 };
