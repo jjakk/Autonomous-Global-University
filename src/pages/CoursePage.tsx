@@ -22,6 +22,7 @@ function CoursePage() {
 
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
+    const [unitCompletions, setUnitCompletions] = useState<{ [unitId: number]: boolean }>({});
     
     const activeStep = units.findIndex(u => u.id === parseInt(searchParams.get("unit") ?? ""));
       const handleStepChange = (e: any) => {
@@ -60,6 +61,12 @@ function CoursePage() {
             console.log("Units created and loaded to database: ", retrievedUnits);
         }
 
+        for(const unit of retrievedUnits) {
+            const readings = await aguDb.readings.where("unitId").equals(unit.id).toArray();
+            const completedUnit = readings.length > 0 && readings.every(r => r.read);
+            setUnitCompletions(prev => ({ ...prev, [unit.id]: completedUnit }));
+        }
+
         setUnits(retrievedUnits);
     };
 
@@ -67,6 +74,7 @@ function CoursePage() {
     const { loading: loadingUnits, wrapped: retreiveUnits } = useAsyncLoading(_retreiveUnits);
     const loadingContent = loadingCourse || loadingUnits || !course;
 
+        console.log(unitCompletions);
     useEffect(() => {
         if(courseId) {
             if(ranOnLoad.current) return;
@@ -90,19 +98,26 @@ function CoursePage() {
                     onClick={() => navigate("/plan-of-study")}
                     icon="pi pi-chevron-left"
                 />
-                {/* <h1 className="ml-4">{course?.name}</h1>
-                <h3 className="ml-4">{course?.description}</h3> */}
             </div>
             <Section title={getCourseLabel(course)} subtitle={course?.description}>
                 <h2 className="m-4">Curriculum</h2>
-                <Stepper orientation="vertical" activeStep={activeStep} onChangeStep={handleStepChange}>
+                <Stepper
+                    orientation="vertical"
+                    activeStep={activeStep}
+                    onChangeStep={handleStepChange}
+                    >
                     {units.map((unit) => (
                         <StepperPanel
-                            key={unit.name}
+                            key={unit.id}
                             header={unit.name}
+                            pt={{number: {
+                                    className: `unit-number ${unitCompletions[unit.id] ? "complete" : ""}`
+                            }}}
                         >
-                            <h1>{unit.name}</h1>
-                            <UnitPreview unit={unit} />
+                            <div className="p-4">
+                                <h1>{unit.name}</h1>
+                                <UnitPreview unit={unit} />
+                            </div>
                         </StepperPanel>
                     ))}
                 </Stepper>

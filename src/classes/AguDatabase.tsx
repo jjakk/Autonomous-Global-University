@@ -93,7 +93,7 @@ export const unitsSchema_JSON = {
 const READING_DB_SCHEMA = "++id,unitId,title,description,read,content";
 export interface Reading {
     id: number;
-    unitId: string;
+    unitId: number;
     title: string;
     description: string;
     content: string[];
