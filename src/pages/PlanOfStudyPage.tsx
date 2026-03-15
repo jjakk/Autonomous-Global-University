@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import { getCourseLabel, getGreeting } from "../utils";
+import { getCourseLabel, getGreeting, getPlanOfStudyProgress } from "../utils";
 import { useNavigate } from "react-router-dom";
-import { aguDb, type Course, type User } from "../classes/AguDatabase";
+import { aguDb, type Course, type User, type Year } from "../classes/AguDatabase";
 import ChatAgent from "../classes/ChatAgent";
 import { useAsyncLoading } from "../hooks";
 import { PageLoading } from "../components/PageLoading";
@@ -44,15 +44,26 @@ function PlanOfStudyPage() {
     const navigate = useNavigate();
     const ranOnLoad = useRef(false);
 
-    const [courses, setCourses] = useState<Course[]>([]);
     const [user, setUser] = useState<User | null>(null);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [planOfStudyProgress, setPlanOfStudyProgress] = useState<number>(0);
 
     const createPlanOfStudy = async (): Promise<Course[]> => {
         // Create the plan of study using the ChatAgent
         const user: User = await aguDb.getUser();
         const agent = new ChatAgent(user.apiKey);
         
-        const courses: Course[] = await agent.createPlanOfStudy(user.major);
+        // Initialize 4 years to group courses into
+        const yrs: Partial<Year>[] = [
+            { name: "Freshman Year", index: 1 },
+            { name: "Sophomore Year", index: 2 },
+            { name: "Junior Year", index: 3 },
+            { name: "Senior Year", index: 4 },
+        ];
+        await aguDb.years.bulkAdd(yrs as Year[]);
+        const years: Year[] = await aguDb.years.toArray();
+
+        const courses: Course[] = await agent.createPlanOfStudy(user.major, years);
         await aguDb.courses.bulkAdd(courses);
 
         return courses;
@@ -69,19 +80,24 @@ function PlanOfStudyPage() {
     };
     const _retreiveCourses = async (): Promise<void> => {
         let coursesInDb: Course[] = await aguDb.courses.toArray();
-
+        
         if(!coursesInDb.length) {
             console.warn("No courses found in database, creating plan of study...");
             coursesInDb = await createPlanOfStudy();
             console.log("Plan of study created and loaded to database: ", coursesInDb);
         }
-
+        
         setCourses(coursesInDb);
     }
+    const _retreivePlanOfStudyProgress = async (): Promise<void> => {
+        const psp = await getPlanOfStudyProgress();
+        setPlanOfStudyProgress(psp);
+    }
 
+    const { loading: loadingPlanOfStudyProgress, wrapped: retreivePlanOfStudyProgress } = useAsyncLoading(_retreivePlanOfStudyProgress);
     const { loading: loadingUser, wrapped: retreiveUser } = useAsyncLoading(_retreiveUser);
     const { loading: loadingCourses, wrapped: retreiveCourses } = useAsyncLoading(_retreiveCourses);
-    const loading = loadingUser || loadingCourses || !user;
+    const loading = loadingPlanOfStudyProgress || loadingUser || loadingCourses || !user;
     
     useEffect(() => {
         if(ranOnLoad.current) return;
@@ -89,6 +105,7 @@ function PlanOfStudyPage() {
         
         retreiveUser();
         retreiveCourses();
+        retreivePlanOfStudyProgress();
     }, []);
 
     return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
@@ -108,7 +125,7 @@ function PlanOfStudyPage() {
                     <Section title="Course of Study Progress" centerTitle>
                         <div className="flex flex-col flex-1 items-center gap-5 mt-5">
                             <Knob
-                                value={10}
+                                value={planOfStudyProgress}
                                 size={150}
                                 valueTemplate={'{value}%'}
                                 readOnly

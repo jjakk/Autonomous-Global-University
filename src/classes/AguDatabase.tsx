@@ -14,7 +14,7 @@ export interface User {
     model: SupportedModels;
 };
 
-const YEAR_DB_SCHEMA = "++id,name,&index";
+const YEAR_DB_SCHEMA = "++id,name,index";
 export interface Year {
     id: number;
     name: string;
@@ -25,7 +25,7 @@ export interface Year {
 const COURSE_DB_SCHEMA = "++id,yearId,name,description,type";
 export interface Course {
     id: number;
-    yearId: string;
+    yearId: number;
     name: string;
     description: string;
     type: "core" | "elective";

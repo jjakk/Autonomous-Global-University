@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON, unitsSchema, unitsSchema_JSON, type Course, type Reading, type Unit } from "./AguDatabase";
+import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON, unitsSchema, unitsSchema_JSON, type Course, type Reading, type Unit, type Year } from "./AguDatabase";
 
 export default class ChatAgent {
     private static model = "gemini-2.5-flash";
@@ -70,13 +70,25 @@ export default class ChatAgent {
             return false;
         }
     }
-    async createPlanOfStudy(major: string): Promise<Course[]> {
+    async createPlanOfStudy(major: string, years: Year[]): Promise<Course[]> {
             const courses: Course[] = await this.createDataStructure<Course>(
                 `Create a 4 year curriculum for a university student majoring in ${major}. Include core courses, electives, and a brief description of each course. Order the courses starting with the easiest first, and the more rigorous courses later.`,
                 coursesSchema,
                 coursesSchema_JSON
             );
-            return courses;
+            const coursesWithYearId: Course[] = courses.map((course, index) => {
+                const yearIndex = Math.min(
+                    Math.floor((index * years.length) / courses.length),
+                    years.length - 1
+                );
+
+                return {
+                    ...course,
+                    yearId: years[yearIndex]?.id,
+                };
+            });
+
+            return coursesWithYearId;
     }
     async createUnits(course: Course): Promise<Partial<Unit>[]> {
         type UnitWithoutCourseId = Omit<Unit, "id" | "courseId">;

@@ -74,7 +74,6 @@ function CoursePage() {
     const { loading: loadingUnits, wrapped: retreiveUnits } = useAsyncLoading(_retreiveUnits);
     const loadingContent = loadingCourse || loadingUnits || !course;
 
-        console.log(unitCompletions);
     useEffect(() => {
         if(courseId) {
             if(ranOnLoad.current) return;

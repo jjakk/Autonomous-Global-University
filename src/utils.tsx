@@ -1,4 +1,4 @@
-import type { Course } from "./classes/AguDatabase";
+import { aguDb, type Course } from "./classes/AguDatabase";
 
 export const calculateCourseCode = (index: number): number => {
     return parseInt(`${Math.ceil((index + 1) / 10)}0${index % 10}`);
@@ -21,35 +21,40 @@ export const getGreeting = (name: string) => {
     return `Good ${greeting}, ${name}!`;
 }
 
-// export const evalPlanOfStudyProgress = (courses: Course[] | null): number => {
-//     if(!courses || courses.length === 0) return 0;
-//     const courseProgresses = [];
-//     for(const course of courses) {
-//         courseProgresses.push(evalCourseProgress(course) / 100);
-//     }
-//     const totalProgress = courseProgresses.reduce((acc, curr) => acc + curr, 0);
-//     const averageProgress = totalProgress / courses.length;
+export const getPlanOfStudyProgress = async (): Promise<number> => {
+    const courses: Course[] = await aguDb.courses.toArray();
+    return await getCoursesProgress(courses);
+};
 
-//     return Math.floor(averageProgress * 100);
-// }
+export const getCoursesProgress = async (courses: Course[]): Promise<number> => {
+    if(courses.length === 0) return 0;
 
-// export const evalCourseProgress = (course: Course | null): number => {
-//     if(course?.units?.length === 0) return 0;
-//     let completedReadings = 0;
-//     let totalReadings = 0;
-//     for(const unit of course?.units || []) {
-//         for(const reading of unit.readings) {
-//             if(reading.read) {
-//                 completedReadings++;
-//             }
-//             totalReadings++;
-//         }
-//     }
-//     return Math.floor((completedReadings / totalReadings) * 100);
-// }
+    let courseCompleted = 0;
+    let totalCourses = courses.length;
 
-// export const evalUnitProgress = (unit: Unit): number => {
-//     if(unit.readings.length === 0) return 0;
-//     const completed = unit.readings.filter(r => r.read).length;
-//     return Math.floor((completed / unit.readings.length) * 100);
-// }
+    for(const course of courses) {
+        const units = await aguDb.units.where("courseId").equals(course.id).toArray();
+        if(units.length === 0) continue;
+        
+        let courseUnitCompletion = 0;
+
+        for (const unit of units) {
+            const readings = await aguDb.readings.where("unitId").equals(unit.id).toArray();
+
+            if (readings.length === 0) {
+                courseUnitCompletion += 0; // unit is incomplete
+                continue;
+            }
+
+            const readCount = readings.filter(
+                (reading: any) => reading.read === true || reading.isRead === true
+            ).length;
+
+            courseUnitCompletion += readCount / readings.length;
+        }
+
+        courseCompleted += courseUnitCompletion / units.length;
+    }
+
+    return Math.floor((courseCompleted / totalCourses) * 100);
+};
