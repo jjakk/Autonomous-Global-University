@@ -11,7 +11,7 @@ import Section from "../components/Section";
 
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import { getCourseLabel } from "../utils";
+import { getCompletedUnits, getCourseLabel } from "../utils";
         
 
 function CoursePage() {
@@ -22,7 +22,7 @@ function CoursePage() {
 
     const [course, setCourse] = useState<Course | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
-    const [unitCompletions, setUnitCompletions] = useState<{ [unitId: number]: boolean }>({});
+    const [unitCompletions, setUnitCompletions] = useState<Map<number, boolean>>(new Map());
     
     const activeStep = units.findIndex(u => u.id === parseInt(searchParams.get("unit") ?? ""));
       const handleStepChange = (e: any) => {
@@ -61,11 +61,7 @@ function CoursePage() {
             console.log("Units created and loaded to database: ", retrievedUnits);
         }
 
-        for(const unit of retrievedUnits) {
-            const readings = await aguDb.readings.where("unitId").equals(unit.id).toArray();
-            const completedUnit = readings.length > 0 && readings.every(r => r.read);
-            setUnitCompletions(prev => ({ ...prev, [unit.id]: completedUnit }));
-        }
+        setUnitCompletions(await getCompletedUnits(retrievedUnits));
 
         setUnits(retrievedUnits);
     };
@@ -81,7 +77,7 @@ function CoursePage() {
 
             retreiveCourse(parseInt(courseId));
         }
-    }, []);
+    }, [courseId]);
 
     useEffect(() => {
         if(course) {
@@ -110,7 +106,7 @@ function CoursePage() {
                             key={unit.id}
                             header={unit.name}
                             pt={{number: {
-                                    className: `unit-number ${unitCompletions[unit.id] ? "complete" : ""}`
+                                    className: `unit-number ${unitCompletions.get(unit.id) ? "complete" : ""}`
                             }}}
                         >
                             <div className="p-4">

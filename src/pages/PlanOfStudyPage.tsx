@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import { getCourseLabel, getGreeting, getPlanOfStudyProgress, getYearProgresses } from "../utils";
+import { getCourseLabel, getCourseProgresses, getGreeting, getPlanOfStudyProgress, getYearProgresses } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { aguDb, type Course, type User, type Year } from "../classes/AguDatabase";
 import ChatAgent from "../classes/ChatAgent";
@@ -19,6 +19,7 @@ function PlanOfStudyPage() {
     const [academicYears, setAcademicYears] = useState<Year[]>([]);
     const [planOfStudyProgress, setPlanOfStudyProgress] = useState<number>(0);
     const [yearProgresses, setYearProgresses] = useState<Map<string, number>>(new Map());
+    const [courseProgresses, setCourseProgresses] = useState<Map<number, number>>(new Map());
 
     const createAcademicYears = async (): Promise<Year[]> => {
         const yearsToBulkAdd: Omit<Year, "id">[] = [
@@ -76,7 +77,10 @@ function PlanOfStudyPage() {
     const _retreiveProgresses = async (): Promise<void> => {
         setPlanOfStudyProgress(await getPlanOfStudyProgress());
         setYearProgresses(await getYearProgresses());
+        setCourseProgresses(await getCourseProgresses(courses));
     }
+
+    // console.log(courseProgresses);
 
     const { loading: loadingPlanOfStudyProgress, wrapped: retreiveProgresses } = useAsyncLoading(_retreiveProgresses);
     const { loading: loadingUser, wrapped: retreiveUser } = useAsyncLoading(_retreiveUser);
@@ -89,8 +93,13 @@ function PlanOfStudyPage() {
         
         retreiveUser();
         retreiveCourses();
-        retreiveProgresses();
     }, []);
+
+    useEffect(() => {
+        if(courses.length > 0) {
+            retreiveProgresses();
+        }
+    }, [courses]);
 
     return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
         <div className="flex flex-col items-start gap-4">
@@ -103,9 +112,15 @@ function PlanOfStudyPage() {
                                 {courses.filter((course) => course.yearId === year.id).map((course) => (
                                     <div key={course.name} className="flex justify-content-between align-items-center gap-5 mb-3" >
                                         <div className="flex-1">
-                                            <h2>
-                                                <a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course)}</a>
-                                            </h2>
+                                            <div className="flex align-items-center gap-3">
+                                                <Knob
+                                                    value={courseProgresses.get(course.id) ?? 0}
+                                                    size={35}
+                                                    showValue={false}
+                                                    readOnly
+                                                />
+                                                <h2 className="m-0 p-0"><a onClick={() => navigate(`/course/${course.id}`)} className="cursor-pointer text-blue-900 hover:underline">{getCourseLabel(course)}</a></h2>
+                                            </div>
                                             <h4 className="m-4">{course.description}</h4>
                                         </div>
                                     </div>
