@@ -21,7 +21,7 @@ function AppHeader() {
         const ac: Course[] = await aguDb.courses.toArray();
         setAvailableCourses(ac);
         if(courseId && ac.length > 0) {
-            const courseFound: Course | null = ac.find(c => c.id == courseId) || null;
+            const courseFound: Course | null = ac.find(c => c.id == parseInt(courseId)) || null;
             setSelectedCourse(courseFound);
         }
     };

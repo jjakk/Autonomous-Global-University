@@ -102,7 +102,7 @@ export default class ChatAgent {
     }
     async createUnitReadings(unit: Unit): Promise<Reading[]> {
         const readings: Omit<Reading, 'unitId' | 'read'>[] = await this.createDataStructure<Omit<Reading, 'unitId' | 'read'>>(
-            `Create me a few readings for the following unit: "${unit.name}", with the following description: "${unit.description}". Each should be about a 30 minute read and formatted as paragraphs of text.`,
+            `Create me a few readings for the following unit: "${unit.name}", with the following description: "${unit.description}". Each should be about a 30 minute read and formatted as paragraphs of text in markdown starting with a subheader.`,
             readingsSchema,
             readingsSchema_JSON
         );
