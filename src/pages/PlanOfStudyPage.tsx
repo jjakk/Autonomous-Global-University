@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import { getCourseLabel, getGreeting, getPlanOfStudyProgress } from "../utils";
+import { getCourseLabel, getGreeting, getPlanOfStudyProgress, getYearProgresses } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { aguDb, type Course, type User, type Year } from "../classes/AguDatabase";
 import ChatAgent from "../classes/ChatAgent";
@@ -18,6 +18,7 @@ function PlanOfStudyPage() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [academicYears, setAcademicYears] = useState<Year[]>([]);
     const [planOfStudyProgress, setPlanOfStudyProgress] = useState<number>(0);
+    const [yearProgresses, setYearProgresses] = useState<Map<string, number>>(new Map());
 
     const createAcademicYears = async (): Promise<Year[]> => {
         const yearsToBulkAdd: Omit<Year, "id">[] = [
@@ -72,12 +73,12 @@ function PlanOfStudyPage() {
         setAcademicYears(yearsInDb);
         setCourses(coursesInDb);
     }
-    const _retreivePlanOfStudyProgress = async (): Promise<void> => {
-        const psp = await getPlanOfStudyProgress();
-        setPlanOfStudyProgress(psp);
+    const _retreiveProgresses = async (): Promise<void> => {
+        setPlanOfStudyProgress(await getPlanOfStudyProgress());
+        setYearProgresses(await getYearProgresses());
     }
 
-    const { loading: loadingPlanOfStudyProgress, wrapped: retreivePlanOfStudyProgress } = useAsyncLoading(_retreivePlanOfStudyProgress);
+    const { loading: loadingPlanOfStudyProgress, wrapped: retreiveProgresses } = useAsyncLoading(_retreiveProgresses);
     const { loading: loadingUser, wrapped: retreiveUser } = useAsyncLoading(_retreiveUser);
     const { loading: loadingCourses, wrapped: retreiveCourses } = useAsyncLoading(_retreiveCourses);
     const loading = loadingPlanOfStudyProgress || loadingUser || loadingCourses || !user;
@@ -88,7 +89,7 @@ function PlanOfStudyPage() {
         
         retreiveUser();
         retreiveCourses();
-        retreivePlanOfStudyProgress();
+        retreiveProgresses();
     }, []);
 
     return loading ? PageLoading({ message: "Creating your personalized plan of study..." }) : (
@@ -124,22 +125,13 @@ function PlanOfStudyPage() {
                             />
                         </div>
                         <div className="flex-1-gray-100 p-5 border-round">
-                            <h3 className="m-2">Freshman Year</h3>
-                            <ProgressBar
-                                value={20}
-                            ></ProgressBar>
-                            <h3 className="m-2">Sophomore Year</h3>
-                            <ProgressBar
-                                value={0}
-                            ></ProgressBar>
-                            <h3 className="m-2">Junior Year</h3>
-                            <ProgressBar
-                                value={0}
-                            ></ProgressBar>
-                            <h3 className="m-2">Senior Year</h3>
-                            <ProgressBar
-                                value={0}
-                            ></ProgressBar>
+                            {yearProgresses.size > 0 && Array.from(yearProgresses.entries()).map(([yearName, progress]) => (
+                                <div key={yearName} className="flex flex-col gap-2">
+                                    <span>{yearName}</span>
+                                    <ProgressBar value={progress} showValue={false} />
+                                    <p className="self-end">{progress.toFixed(2)}% completed</p>
+                                </div>
+                            ))}
                         </div>
                     </Section>
                     <Section title="Upcoming Assignments">

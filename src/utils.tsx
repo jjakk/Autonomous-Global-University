@@ -26,6 +26,18 @@ export const getPlanOfStudyProgress = async (): Promise<number> => {
     return await getCoursesProgress(courses);
 };
 
+export const getYearProgresses = async (): Promise<Map<string, number>> => {
+    const progressByYear = new Map<string, number>();
+    const years = await aguDb.years.toArray();
+
+    for (const year of years) {
+        const courses: Course[] = await aguDb.courses.where("yearId").equals(year.id).toArray();
+        progressByYear.set(year.name, await getCoursesProgress(courses));
+    }
+
+    return progressByYear;
+};
+
 export const getCoursesProgress = async (courses: Course[]): Promise<number> => {
     if(courses.length === 0) return 0;
 
