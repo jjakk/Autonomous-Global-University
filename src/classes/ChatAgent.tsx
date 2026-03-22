@@ -3,26 +3,26 @@ import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON,
 import MockData from "./MockData/MockData";
 
 export default class ChatAgent {
-    private static model = "gemini-2.5-flash";
-    private ai: GoogleGenAI;
-    private currentController: AbortController | null;
-    private static isDevelopment = process.env.NODE_ENV === "development";
+    private static _model = "gemini-2.5-flash";
+    private _ai: GoogleGenAI;
+    private _currentController: AbortController | null;
+    private static _isDevelopment = process.env.NODE_ENV === "development";
 
     constructor(apiKey: string) {
         if(!apiKey) {
             throw new Error("API key is required to initialize ChatAgent");
         }
-        this.ai = new GoogleGenAI({ apiKey });
-        this.currentController = null;
+        this._ai = new GoogleGenAI({ apiKey });
+        this._currentController = null;
     }
 
     static async testKey(key: string): Promise<boolean> {
         try {
             const testAI = new GoogleGenAI({ apiKey: key });
-            const response = ChatAgent.isDevelopment
+            const response = this._isDevelopment
                 ? { text: "Test response" }
                 : await testAI.models.generateContent({
-                    model: ChatAgent.model,
+                    model: this._model,
                     contents: "Test",
                     config: { maxOutputTokens: 5 },
                 });
@@ -30,7 +30,7 @@ export default class ChatAgent {
             return !!response.text;
         }
         catch (error) {
-            ChatAgent.onFailedRequest(error);
+            this.onFailedRequest(error);
             return false;
         }
     }
@@ -48,19 +48,19 @@ export default class ChatAgent {
 
     private async createDataStructure<T>(prompt: string, zodSchema: any, jsonSchema: any): Promise<T[]> {
         try {
-            if (this.currentController) {
-                this.currentController.abort();
+            if (this._currentController) {
+                this._currentController.abort();
             }
-            this.currentController = new AbortController();
-            const response = ChatAgent.isDevelopment
+            this._currentController = new AbortController();
+            const response = ChatAgent._isDevelopment
                 ? await MockData.generate(jsonSchema)
-                : await this.ai.models.generateContent({
-                    model: ChatAgent.model,
+                : await this._ai.models.generateContent({
+                    model: ChatAgent._model,
                     contents: prompt,
                     config: {
                         responseMimeType: "application/json",
                         responseJsonSchema: jsonSchema,
-                        abortSignal: this.currentController.signal
+                        abortSignal: this._currentController.signal
                     },
                 });
     
@@ -74,21 +74,21 @@ export default class ChatAgent {
             throw new Error("Failed to create courses. See console for details.");
         }
         finally {
-            this.currentController = null;
+            this._currentController = null;
         }
     }
     async askTaQuestion(course: Course, question: string): Promise<string> {
         try {
-            if (this.currentController) {
-                this.currentController.abort();
+            if (this._currentController) {
+                this._currentController.abort();
             }
-            this.currentController = new AbortController();
-            const response = await this.ai.models.generateContent({
-                model: ChatAgent.model,
+            this._currentController = new AbortController();
+            const response = await this._ai.models.generateContent({
+                model: ChatAgent._model,
                 contents: `You are a helpful teaching assistant for the following course: "${course.name}", with the following description: "${course.description}". Answer the following question from a student as helpfully as possible: "${question}"`,
                 config: {
                     // maxOutputTokens: 500,
-                    abortSignal: this.currentController.signal
+                    abortSignal: this._currentController.signal
                 },
             });
     
@@ -102,7 +102,7 @@ export default class ChatAgent {
             throw new Error("Failed to get TA response. See console for details.");
         }
         finally {
-            this.currentController = null;
+            this._currentController = null;
         }
     }
     async createPlanOfStudy(major: string, years: Year[]): Promise<Course[]> {
