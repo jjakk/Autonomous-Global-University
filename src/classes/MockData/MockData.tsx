@@ -1,25 +1,21 @@
 import courses from "./data/courses.json";
 import units from "./data/units.json";
 import readings from "./data/readings.json";
+import { ChatAgentResources } from "../AguDatabase";
+
+const MOCK_DATA_BY_RESOURCE: Record<ChatAgentResources, unknown> = {
+    [ChatAgentResources.COURSES]: courses,
+    [ChatAgentResources.UNITS]: units,
+    [ChatAgentResources.READINGS]: readings,
+};
+
+
 
 export default class MockData {
-    static async generate(jsonSchema: any): Promise<{ text: string }> {
+    static async generate(jsonSchema: { title: ChatAgentResources; [key: string]: any }): Promise<{ text: string }> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                let generatedData;
-                switch(jsonSchema.title) {
-                    case "courses":
-                        generatedData = courses;
-                        break;
-                    case "units":
-                        generatedData = units;
-                        break;
-                    case "readings":
-                        generatedData = readings;
-                        break;
-                    default:
-                        throw new Error(`No mock data available for schema title: ${jsonSchema.title}`);
-                }
+                const generatedData = MOCK_DATA_BY_RESOURCE[jsonSchema.title];
                 resolve({ text: JSON.stringify(generatedData) });
             }, 500);    
         });

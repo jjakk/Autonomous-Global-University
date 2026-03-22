@@ -16,6 +16,24 @@ export default class ChatAgent {
         this.currentController = null;
     }
 
+    static async testKey(key: string): Promise<boolean> {
+        try {
+            const testAI = new GoogleGenAI({ apiKey: key });
+            const response = ChatAgent.isDevelopment
+                ? { text: "Test response" }
+                : await testAI.models.generateContent({
+                    model: ChatAgent.model,
+                    contents: "Test",
+                    config: { maxOutputTokens: 5 },
+                });
+
+            return !!response.text;
+        }
+        catch (error) {
+            ChatAgent.onFailedRequest(error);
+            return false;
+        }
+    }
     private static onFailedRequest(error: any) {
         if(error?.status === 429) {
             console.error("Rate limit hit");
@@ -27,6 +45,7 @@ export default class ChatAgent {
             console.error("Error in ChatAgent request: ", error);
         }
     }
+
     private async createDataStructure<T>(prompt: string, zodSchema: any, jsonSchema: any): Promise<T[]> {
         try {
             if (this.currentController) {
@@ -56,25 +75,6 @@ export default class ChatAgent {
         }
         finally {
             this.currentController = null;
-        }
-    }
-
-    static async testKey(key: string): Promise<boolean> {
-        try {
-            const testAI = new GoogleGenAI({ apiKey: key });
-            const response = ChatAgent.isDevelopment
-                ? { text: "Test response" }
-                : await testAI.models.generateContent({
-                    model: ChatAgent.model,
-                    contents: "Test",
-                    config: { maxOutputTokens: 5 },
-                });
-                
-            return !!response.text;
-        }
-        catch (error) {
-            ChatAgent.onFailedRequest(error);
-            return false;
         }
     }
     async askTaQuestion(course: Course, question: string): Promise<string> {

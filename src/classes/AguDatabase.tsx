@@ -5,6 +5,11 @@ import AppAuth from "./AppAuth";
 export enum SupportedModels {
     GEMINI = "gemini",
 };
+export enum ChatAgentResources {
+    COURSES = "courses",
+    UNITS = "units",
+    READINGS = "readings",
+}
 const USER_DB_SCHEMA = "apiKey,firstName,major,model";
 export interface User {
     apiKey: string;
@@ -38,7 +43,7 @@ export const coursesSchema: z.ZodType = z.array(z.object({
     code: z.number().int().positive(),
 }));
 export const coursesSchema_JSON = {
-    title: "courses",
+    title: ChatAgentResources.COURSES,
     type: "array",
     uniqueItems: true,
     // Requires validator support (e.g., ajv-keywords) to enforce uniqueness by a specific property.
@@ -75,7 +80,7 @@ export const unitsSchema: z.ZodType = z.array(
     })
 );
 export const unitsSchema_JSON = {
-    title: "units",
+    title: ChatAgentResources.UNITS,
     type: "array",
     minItems: 15,
     maxItems: 15,
@@ -107,7 +112,7 @@ export const readingsSchema: z.ZodType = z.array(
     })
 );
 export const readingsSchema_JSON = {
-    title: "readings",
+    title: ChatAgentResources.READINGS,
     type: "array",
     minItems: 3,
     maxItems: 4,
