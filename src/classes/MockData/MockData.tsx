@@ -9,17 +9,36 @@ const MOCK_DATA_BY_RESOURCE: Record<ChatAgentResources, unknown> = {
     [ChatAgentResources.READINGS]: readings,
 };
 
+interface GenArgs {
+    config: {
+        responseJsonSchema?: {
+            title: ChatAgentResources;
+            [key: string]: any;
+        }
+    }
+    [key: string]: any;
+};
 
 
 export default class MockData {
-    private static _fakeLatency = 500; // milliseconds
+    private static _fakeLatency = 1000; // milliseconds
 
-    static async generate(jsonSchema: { title: ChatAgentResources; [key: string]: any }): Promise<{ text: string }> {
+    static async generate(genArgs: GenArgs): Promise<{ text: string }> {
+        const { responseJsonSchema } = genArgs.config;
+
+        if(!responseJsonSchema) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({ text: "Mock response text" });
+                }, MockData._fakeLatency);
+            });
+        }
+
         return new Promise((resolve) => {
             setTimeout(() => {
-                const generatedData = MOCK_DATA_BY_RESOURCE[jsonSchema.title];
+                const generatedData = MOCK_DATA_BY_RESOURCE[responseJsonSchema.title];
                 resolve({ text: JSON.stringify(generatedData) });
-            }, this._fakeLatency);    
+            }, MockData._fakeLatency);    
         });
     }
 };

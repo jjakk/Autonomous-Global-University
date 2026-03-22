@@ -3,9 +3,10 @@ import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON,
 import MockData from "./MockData/MockData";
 
 export default class ChatAgent {
-    private static _model = "gemini-2.5-flash";
     private _ai: GoogleGenAI;
+    private _generateContent: Function;
     private _currentController: AbortController | null;
+    private static _model = "gemini-2.5-flash";
     private static _isDevelopment = process.env.NODE_ENV === "development";
 
     constructor(apiKey: string) {
@@ -13,16 +14,17 @@ export default class ChatAgent {
             throw new Error("API key is required to initialize ChatAgent");
         }
         this._ai = new GoogleGenAI({ apiKey });
+        this._generateContent = ChatAgent._isDevelopment ? MockData.generate : this._ai.models.generateContent;
         this._currentController = null;
     }
 
     static async testKey(key: string): Promise<boolean> {
         try {
             const testAI = new GoogleGenAI({ apiKey: key });
-            const response = this._isDevelopment
+            const response = ChatAgent._isDevelopment
                 ? { text: "Test response" }
                 : await testAI.models.generateContent({
-                    model: this._model,
+                    model: ChatAgent._model,
                     contents: "Test",
                     config: { maxOutputTokens: 5 },
                 });
@@ -52,17 +54,15 @@ export default class ChatAgent {
                 this._currentController.abort();
             }
             this._currentController = new AbortController();
-            const response = ChatAgent._isDevelopment
-                ? await MockData.generate(jsonSchema)
-                : await this._ai.models.generateContent({
-                    model: ChatAgent._model,
-                    contents: prompt,
-                    config: {
-                        responseMimeType: "application/json",
-                        responseJsonSchema: jsonSchema,
-                        abortSignal: this._currentController.signal
-                    },
-                });
+            const response = await this._generateContent({
+                model: ChatAgent._model,
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseJsonSchema: jsonSchema,
+                    abortSignal: this._currentController.signal
+                },
+            });
     
             if(!response.text) {
                 throw new Error("No response from AI");
@@ -83,7 +83,7 @@ export default class ChatAgent {
                 this._currentController.abort();
             }
             this._currentController = new AbortController();
-            const response = await this._ai.models.generateContent({
+            const response = await this._generateContent({
                 model: ChatAgent._model,
                 contents: `You are a helpful teaching assistant for the following course: "${course.name}", with the following description: "${course.description}". Answer the following question from a student as helpfully as possible: "${question}"`,
                 config: {
