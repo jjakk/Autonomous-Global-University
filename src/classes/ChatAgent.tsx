@@ -3,7 +3,6 @@ import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON,
 import MockData from "./MockData/MockData";
 
 export default class ChatAgent {
-    private _ai: GoogleGenAI;
     private _generateContent: Function;
     private _currentController: AbortController | null;
     private static _model = "gemini-2.5-flash";
@@ -13,8 +12,8 @@ export default class ChatAgent {
         if(!apiKey) {
             throw new Error("API key is required to initialize ChatAgent");
         }
-        this._ai = new GoogleGenAI({ apiKey });
-        this._generateContent = ChatAgent._isDevelopment ? MockData.generate : this._ai.models.generateContent;
+        const ai = new GoogleGenAI({ apiKey });
+        this._generateContent = ChatAgent._isDevelopment ? MockData.generate : ai.models.generateContent;
         this._currentController = null;
     }
 
