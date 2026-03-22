@@ -1,0 +1,230 @@
+[
+    {
+        "name": "Introduction to Computer Science",
+        "description": "Foundational concepts in programming, algorithms, and problem-solving.",
+        "type": "core",
+        "code": 101
+    },
+    {
+        "name": "College Algebra",
+        "description": "Functions, equations, inequalities, and mathematical modeling for computing contexts.",
+        "type": "core",
+        "code": 105
+    },
+    {
+        "name": "Discrete Mathematics",
+        "description": "Logic, sets, combinatorics, graph theory, and proof techniques used in computer science.",
+        "type": "core",
+        "code": 110
+    },
+    {
+        "name": "Academic Writing and Communication",
+        "description": "Practice in academic writing, research-based arguments, and presentation skills.",
+        "type": "core",
+        "code": 115
+    },
+    {
+        "name": "First-Year Seminar",
+        "description": "Orientation to university learning, study strategies, and academic planning.",
+        "type": "core",
+        "code": 120
+    },
+    {
+        "name": "Digital Literacy",
+        "description": "Essential computing tools, information evaluation, and responsible digital participation.",
+        "type": "core",
+        "code": 130
+    },
+    {
+        "name": "Calculus I",
+        "description": "Limits, derivatives, and applications of differential calculus.",
+        "type": "core",
+        "code": 140
+    },
+    {
+        "name": "Introduction to Psychology",
+        "description": "Overview of cognition, behavior, motivation, and social interaction.",
+        "type": "elective",
+        "code": 150
+    },
+    {
+        "name": "Data Structures",
+        "description": "Covers arrays, linked lists, stacks, queues, trees, and hash tables.",
+        "type": "core",
+        "code": 210
+    },
+    {
+        "name": "Computer Organization",
+        "description": "Digital logic, instruction sets, memory hierarchy, and low-level program execution.",
+        "type": "core",
+        "code": 220
+    },
+    {
+        "name": "Web Development Fundamentals",
+        "description": "Introduction to HTML, CSS, JavaScript, and modern web development workflows.",
+        "type": "elective",
+        "code": 225
+    },
+    {
+        "name": "Probability and Statistics",
+        "description": "Probability distributions, statistical inference, and data interpretation for computing.",
+        "type": "core",
+        "code": 230
+    },
+    {
+        "name": "Calculus II",
+        "description": "Integration techniques, sequences and series, and applied multivariable topics.",
+        "type": "core",
+        "code": 240
+    },
+    {
+        "name": "User Experience Design",
+        "description": "Principles of interaction design, usability evaluation, and human-centered prototyping.",
+        "type": "elective",
+        "code": 250
+    },
+    {
+        "name": "Object-Oriented Programming",
+        "description": "Classes, inheritance, interfaces, and software design using object-oriented paradigms.",
+        "type": "core",
+        "code": 260
+    },
+    {
+        "name": "Ethics in Technology",
+        "description": "Ethical frameworks and case studies on privacy, bias, security, and professional conduct.",
+        "type": "core",
+        "code": 270
+    },
+    {
+        "name": "Database Systems",
+        "description": "Relational modeling, SQL, normalization, and transaction fundamentals.",
+        "type": "core",
+        "code": 305
+    },
+    {
+        "name": "Algorithms",
+        "description": "Algorithm design techniques, complexity analysis, and correctness reasoning.",
+        "type": "core",
+        "code": 310
+    },
+    {
+        "name": "Operating Systems",
+        "description": "Processes, threads, scheduling, memory management, and file systems.",
+        "type": "core",
+        "code": 315
+    },
+    {
+        "name": "Computer Networks",
+        "description": "Network architectures, protocols, routing, transport mechanisms, and network security basics.",
+        "type": "core",
+        "code": 320
+    },
+    {
+        "name": "Artificial Intelligence Basics",
+        "description": "Survey of search, knowledge representation, and introductory machine learning concepts.",
+        "type": "elective",
+        "code": 330
+    },
+    {
+        "name": "Human-Computer Interaction",
+        "description": "Design and evaluation of interactive systems with a focus on accessibility and usability.",
+        "type": "elective",
+        "code": 335
+    },
+    {
+        "name": "Software Engineering",
+        "description": "Software design principles, testing strategies, version control, and team workflows.",
+        "type": "core",
+        "code": 340
+    },
+    {
+        "name": "Technical Communication",
+        "description": "Documentation, technical reports, API writing, and communication in engineering teams.",
+        "type": "core",
+        "code": 350
+    },
+    {
+        "name": "Cybersecurity Fundamentals",
+        "description": "Threat models, cryptography basics, authentication, and secure software practices.",
+        "type": "core",
+        "code": 360
+    },
+    {
+        "name": "Mobile Application Development",
+        "description": "Design and implementation of mobile applications with platform-specific tooling.",
+        "type": "elective",
+        "code": 370
+    },
+    {
+        "name": "Distributed Systems",
+        "description": "Distributed architectures, consistency models, fault tolerance, and coordination.",
+        "type": "core",
+        "code": 410
+    },
+    {
+        "name": "Machine Learning",
+        "description": "Supervised and unsupervised learning, model evaluation, and practical ML workflows.",
+        "type": "elective",
+        "code": 415
+    },
+    {
+        "name": "Cloud Computing",
+        "description": "Core concepts of cloud infrastructure, deployment models, and scalable services.",
+        "type": "elective",
+        "code": 420
+    },
+    {
+        "name": "DevOps and CI/CD",
+        "description": "Automation pipelines, infrastructure as code, observability, and release engineering.",
+        "type": "elective",
+        "code": 425
+    },
+    {
+        "name": "Data Visualization",
+        "description": "Visual design principles, storytelling with data, and interactive dashboards.",
+        "type": "elective",
+        "code": 430
+    },
+    {
+        "name": "Information Retrieval",
+        "description": "Indexing, ranking, search systems, and evaluation of retrieval quality.",
+        "type": "elective",
+        "code": 440
+    },
+    {
+        "name": "Compiler Design",
+        "description": "Lexing, parsing, semantic analysis, optimization, and code generation.",
+        "type": "elective",
+        "code": 450
+    },
+    {
+        "name": "Parallel and High-Performance Computing",
+        "description": "Concurrency models, parallel algorithms, and performance optimization techniques.",
+        "type": "elective",
+        "code": 460
+    },
+    {
+        "name": "Research Methods in Computing",
+        "description": "Experimental design, literature review, reproducibility, and technical research writing.",
+        "type": "core",
+        "code": 470
+    },
+    {
+        "name": "Capstone Project I",
+        "description": "Team-based project planning, requirements analysis, and initial implementation.",
+        "type": "core",
+        "code": 480
+    },
+    {
+        "name": "Industry Internship",
+        "description": "Supervised practical experience applying computing knowledge in professional settings.",
+        "type": "elective",
+        "code": 490
+    },
+    {
+        "name": "Capstone Project II",
+        "description": "Completion, testing, deployment, and formal presentation of a major software project.",
+        "type": "core",
+        "code": 495
+    }
+]

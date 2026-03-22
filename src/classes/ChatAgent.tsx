@@ -1,10 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { coursesSchema, coursesSchema_JSON, readingsSchema, readingsSchema_JSON, unitsSchema, unitsSchema_JSON, type Course, type Reading, type Unit, type Year } from "./AguDatabase";
+import MockData from "./MockData/MockData";
 
 export default class ChatAgent {
     private static model = "gemini-2.5-flash";
     private ai: GoogleGenAI;
     private currentController: AbortController | null;
+    private static isDevelopment = process.env.NODE_ENV === "development";
 
     constructor(apiKey: string) {
         if(!apiKey) {
@@ -31,15 +33,17 @@ export default class ChatAgent {
                 this.currentController.abort();
             }
             this.currentController = new AbortController();
-            const response = await this.ai.models.generateContent({
-                model: ChatAgent.model,
-                contents: prompt,
-                config: {
-                    responseMimeType: "application/json",
-                    responseJsonSchema: jsonSchema,
-                    abortSignal: this.currentController.signal
-                },
-            });
+            const response = ChatAgent.isDevelopment
+                ? await MockData.generate(jsonSchema)
+                : await this.ai.models.generateContent({
+                    model: ChatAgent.model,
+                    contents: prompt,
+                    config: {
+                        responseMimeType: "application/json",
+                        responseJsonSchema: jsonSchema,
+                        abortSignal: this.currentController.signal
+                    },
+                });
     
             if(!response.text) {
                 throw new Error("No response from AI");
@@ -58,11 +62,14 @@ export default class ChatAgent {
     static async testKey(key: string): Promise<boolean> {
         try {
             const testAI = new GoogleGenAI({ apiKey: key });
-            const response = await testAI.models.generateContent({
-                model: ChatAgent.model,
-                contents: "Test",
-                config: { maxOutputTokens: 5 },
-            });
+            const response = ChatAgent.isDevelopment
+                ? { text: "Test response" }
+                : await testAI.models.generateContent({
+                    model: ChatAgent.model,
+                    contents: "Test",
+                    config: { maxOutputTokens: 5 },
+                });
+                
             return !!response.text;
         }
         catch (error) {

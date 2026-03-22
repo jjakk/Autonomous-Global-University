@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Global Citizenship",
+        "description": "Introduces students to global responsibilities, cultural awareness, and ethical participation in an interconnected world."
+    },
+    {
+        "name": "Critical Thinking and Logic",
+        "description": "Builds foundational reasoning skills, argument analysis, and evidence-based decision making across disciplines."
+    },
+    {
+        "name": "Academic Writing",
+        "description": "Develops clear, structured, and persuasive writing for essays, reports, and research communication."
+    },
+    {
+        "name": "Research Methods",
+        "description": "Covers qualitative and quantitative research design, data collection, and basic interpretation techniques."
+    },
+    {
+        "name": "Digital Literacy",
+        "description": "Strengthens practical skills in digital tools, online collaboration, information evaluation, and cybersecurity awareness."
+    },
+    {
+        "name": "Data Fundamentals",
+        "description": "Introduces core concepts in data representation, cleaning, visualization, and introductory statistical thinking."
+    },
+    {
+        "name": "Programming Principles",
+        "description": "Teaches variables, control flow, functions, and problem decomposition through beginner-friendly coding tasks."
+    },
+    {
+        "name": "Artificial Intelligence Foundations",
+        "description": "Explores key AI concepts, machine learning basics, responsible AI use, and real-world applications."
+    },
+    {
+        "name": "Systems Thinking",
+        "description": "Examines complex systems, feedback loops, and holistic approaches to solving societal and technical problems."
+    },
+    {
+        "name": "Project Management Basics",
+        "description": "Introduces planning, scheduling, risk management, and teamwork practices for successful project delivery."
+    },
+    {
+        "name": "Entrepreneurship and Innovation",
+        "description": "Focuses on idea generation, market validation, business models, and iterative product development."
+    },
+    {
+        "name": "Sustainability Studies",
+        "description": "Investigates environmental, social, and economic sustainability challenges and practical intervention strategies."
+    },
+    {
+        "name": "Intercultural Communication",
+        "description": "Enhances communication across cultures through empathy, inclusive language, and context-aware interaction."
+    },
+    {
+        "name": "Ethics in Technology",
+        "description": "Analyzes privacy, bias, accountability, and governance issues in modern technological systems."
+    },
+    {
+        "name": "Capstone Preparation",
+        "description": "Prepares students to define project scope, research goals, and implementation plans for final capstone work."
+    }
+]

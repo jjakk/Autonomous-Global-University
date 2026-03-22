@@ -1,0 +1,38 @@
+[
+    {
+        "title": "Introduction to Autonomous Systems",
+        "description": "A foundational overview of what autonomous systems are and how they are designed.",
+        "content": [
+            "## What Is an Autonomous System?\nAn autonomous system is a machine or software agent capable of making decisions and acting without continuous human control.",
+            "## Core Components\nMost systems combine sensing, planning, and actuation. Sensors gather data, planners choose actions, and actuators execute them.",
+            "## Real-World Examples\nExamples include self-driving vehicles, warehouse robots, and intelligent drone navigation platforms."
+        ]
+    },
+    {
+        "title": "Perception and Sensor Fusion",
+        "description": "Covers how autonomous platforms interpret the environment using multiple sensor inputs.",
+        "content": [
+            "## Why Perception Matters\nPerception transforms raw sensor data into usable representations like objects, lanes, and obstacles.",
+            "## Common Sensors\nTypical sensors include cameras, LiDAR, radar, GPS, and IMUs, each with different strengths and weaknesses.",
+            "## Sensor Fusion Basics\nFusion combines complementary data sources to improve robustness, especially in noisy or uncertain conditions."
+        ]
+    },
+    {
+        "title": "Decision-Making Under Uncertainty",
+        "description": "Introduces methods used to choose actions when outcomes are probabilistic.",
+        "content": [
+            "## Uncertainty in Autonomous Environments\nAutonomous agents operate with incomplete information, dynamic obstacles, and imperfect models.",
+            "## Planning Approaches\nRule-based systems, search algorithms, and probabilistic planners are commonly used depending on task complexity.",
+            "## Safety and Reliability\nSafe decision-making requires fallback behaviors, confidence thresholds, and continuous risk evaluation."
+        ]
+    },
+    {
+        "title": "Ethics and Governance in AI Autonomy",
+        "description": "Examines societal, legal, and ethical considerations in deploying autonomous technologies.",
+        "content": [
+            "## Ethical Design Principles\nTransparency, fairness, accountability, and human oversight are central to responsible autonomy.",
+            "## Regulatory Landscape\nStandards and regulations vary across sectors, from transportation to healthcare and defense.",
+            "## Human-Centered Deployment\nSuccessful systems align with public trust, include clear failure handling, and support auditability."
+        ]
+    }
+]

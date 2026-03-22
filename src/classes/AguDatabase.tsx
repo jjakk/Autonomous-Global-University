@@ -38,6 +38,7 @@ export const coursesSchema: z.ZodType = z.array(z.object({
     code: z.number().int().positive(),
 }));
 export const coursesSchema_JSON = {
+    title: "courses",
     type: "array",
     uniqueItems: true,
     // Requires validator support (e.g., ajv-keywords) to enforce uniqueness by a specific property.
@@ -74,6 +75,7 @@ export const unitsSchema: z.ZodType = z.array(
     })
 );
 export const unitsSchema_JSON = {
+    title: "units",
     type: "array",
     minItems: 15,
     maxItems: 15,
@@ -105,6 +107,7 @@ export const readingsSchema: z.ZodType = z.array(
     })
 );
 export const readingsSchema_JSON = {
+    title: "readings",
     type: "array",
     minItems: 3,
     maxItems: 4,
